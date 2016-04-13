@@ -1126,7 +1126,6 @@ function selectElement(data) {
 export function createShapeElement(data) {
 	let canvasId = data['canvasId'];
 	let businessType = data['businessType'];
-	let businessData = data['businessData'];
 	let positionX = data['positionX'];
 	let positionY = data['positionY'];
     let canvas = getCanvasById(canvasId);
@@ -1149,9 +1148,19 @@ export function createShapeElement(data) {
 	shapeItem.Links = shapeLinks;
 	shapeItem.SetTanslate(positionX, positionY);
 	shapeItem.BusinessType = businessType;
-	shapeItem.BusinessData = businessData;
 	canvas.PaperFitToContent(shapeItem);
-	return shapeItem.Id;
+
+	let result = {
+		shape:{
+        nodeId: shapeItem.Id,
+		clonedId: '',
+        nodeText: shapeItem.Text,
+        nodeType: 'shape',
+        businessType: businessType,
+        businessData: shapeItem.BusinessData
+    }};
+
+	return JSON.stringify(result);
 }
 
 
@@ -1159,7 +1168,6 @@ export function createShapeElement(data) {
 export function createLineElement(data) {
 	let canvasId = data['canvasId'];
 	let businessType = data['businessType'];
-	let businessData = data['businessData'];
 	let sourceId = data['sourceId'];
 	let targetId = data['targetId'];
 	let canvas = getCanvasById(canvasId);
@@ -1173,7 +1181,17 @@ export function createLineElement(data) {
 
 	lineItem.InitByData(linkInfo);
 	lineItem.CreateStraightLine();
-	lineItem.BusinessData = businessData;
+
+	let result = {
+		line:{
+        nodeId: lineItem.Id,
+        nodeText: lineItem.Text,
+        nodeType: 'line',
+        businessType: businessType,
+        businessData: lineItem.BusinessData
+    }};
+
+	return JSON.stringify(result);
 }
 
 // handle wpf message end

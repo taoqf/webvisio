@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"target": "ES5",
+		"module": "amd",
+		"declaration": false,
+		"noImplicitAny": false,
+		"removeComments": false,
+		"noLib": true,
+		"preserveConstEnums": true,
+		"sourceMap": false,
+		"moduleResolution": "node",
+		"isolatedModules": false,
+		"jsx": "react",
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"suppressImplicitAnyIndexErrors": true
+	},
+	"exclude": [
+	],
+	"atom": {
+		"rewriteTsconfig": false
+	}
+}

@@ -1,0 +1,118 @@
+﻿.input-t, textarea, .dropdownBox {
+  border-color: #dddddd;
+  color: #333333; }
+
+.input-t:focus, textarea:focus {
+  border-color: #3498DB; }
+
+/*.dropdownBox li a{color:$color-bg-default;}
+.dropdownBox li a:hover{background:$color-bg-default;color: $color-font;}*/
+/*.table-striped tr:nth-child(even){
+	background:$color-bg-default;
+	color:$color-font;
+}
+table td,table th,.table-bordered,.table-bordered td{
+	border-color: $color-border;
+}*/
+/*.panel-default{
+  border-color:darken($color-bg-default,$color-change);
+  .panel-heading{
+    background: $color-bg-default;
+    color:$color-font;
+  }
+}*/
+.page li a:hover {
+  background: #3498DB;
+  color: #ffffff; }
+
+.page {
+  border-style: #dddddd; }
+  .page li a {
+    border-style: #dddddd; }
+
+.active {
+  background: #3498DB !important;
+  color: #ffffff !important; }
+
+.active a {
+  background: #3498DB !important;
+  color: #ffffff !important; }
+
+.nav {
+  background: #3498DB; }
+
+.nav .active a {
+  background: #258cd1 !important; }
+
+.nav li a {
+  color: #e6e6e6; }
+
+.nav li a:hover {
+  background: #258cd1;
+  color: #ffffff; }
+
+.nav-vertical-line li {
+  border-right: 1px solid #258cd1;
+  border-left: 1px solid #5faee3; }
+
+.nav-underscore li {
+  border-bottom: 1px solid #258cd1;
+  border-top: 1px solid #5faee3; }
+
+.nav-vertical {
+  border: 1px solid #258cd1; }
+
+.dropdown .dropdown-menu {
+  background-color: #3498DB;
+  border: 1px solid #258cd1 !important; }
+
+.datepicker table tr td.active:hover,
+.datepicker table tr td.active:hover:hover,
+.datepicker table tr td.active.disabled:hover,
+.datepicker table tr td.active.disabled:hover:hover,
+.datepicker table tr td.active:active,
+.datepicker table tr td.active:hover:active,
+.datepicker table tr td.active.disabled:active,
+.datepicker table tr td.active.disabled:hover:active,
+.datepicker table tr td.active.active,
+.datepicker table tr td.active:hover.active,
+.datepicker table tr td.active.disabled.active,
+.datepicker table tr td.active.disabled:hover.active,
+.datepicker table tr td.active.disabled,
+.datepicker table tr td.active:hover.disabled,
+.datepicker table tr td.active.disabled.disabled,
+.datepicker table tr td.active.disabled:hover.disabled,
+.datepicker table tr td.active[disabled],
+.datepicker table tr td.active:hover[disabled],
+.datepicker table tr td.active.disabled[disabled],
+.datepicker table tr td.active.disabled:hover[disabled] {
+  background-color: #3498DB;
+  color: #ffffff; }
+
+.datepicker table tr td.active:active,
+.datepicker table tr td.active:hover:active,
+.datepicker table tr td.active.disabled:active,
+.datepicker table tr td.active.disabled:hover:active,
+.datepicker table tr td.active.active,
+.datepicker table tr td.active:hover.active,
+.datepicker table tr td.active.disabled.active,
+.datepicker table tr td.active.disabled:hover.active {
+  background-color: #3498DB \9; }
+
+.ui-dialog-footer button.ui-dialog-autofocus {
+  color: #ffffff;
+  background-color: #3498DB;
+  border-color: #217dbb; }
+
+.ui-dialog-footer button.ui-dialog-autofocus:hover,
+.ui-dialog-footer button.ui-dialog-autofocus:focus,
+.ui-dialog-footer button.ui-dialog-autofocus:active {
+  color: #ffffff;
+  background-color: #217dbb;
+  border-color: #196090; }
+
+/*# sourceMappingURL=theme-blue.css.map */
+/*刘奇文*/
+.a-hover:hover {background:red;}
+.l-ht160{line-height: 160px;}
+.div-h-l:hover .div-h{display: block;}

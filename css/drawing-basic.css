@@ -1,0 +1,270 @@
+* {
+    vector-effect: non-scaling-stroke;
+    -moz-user-select: none;
+    user-drag: none;
+}
+.stencil-container{
+	position: absolute;
+	left: 0;
+	top: 0px;
+	bottom: 0px;
+	width: 240px;
+	height: auto;
+	border-bottom: 1px solid lightgray;
+	background-color: hsla(220,11%,97%,.95);
+	color: #bcbcbc;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding-top: 10px;
+	text-align: center;
+}
+
+.stencil-text{
+	margin-top: 10px;
+	margin-bottom: 15px;
+	color: black;
+}
+
+.splitter-container {
+    position: absolute;
+    top: 0px;
+    left: 241px;
+    right: auto;
+    bottom: 0px;
+	width: 15px;
+    overflow: hidden;
+	background-color: hsla(220,11%,97%,.95);
+	border-right: 1px solid lightgray;
+}
+
+.splitter {
+	position: absolute;
+	top: 50%;
+    margin-top: -24px;
+    width: 15px;
+    height: 50px;
+	line-height: 50px;
+	cursor: pointer;
+	background-color: #DDDDEE;
+	color: #000;
+}
+
+.paper-container {
+    position: absolute;
+	padding-left: 5px;
+	padding-top: 5px;
+    top: 0px;
+    left: 241px;
+    right: 0px;
+    bottom: 0px;
+    overflow: hidden;
+	border-bottom: 1px solid lightgray;
+	background-color: hsla(220,11%,97%,.95);
+}
+
+.paper-scroller {
+    position: relative;
+    overflow: auto;
+    box-sizing: border-box;
+	width: 100%;
+    height: 100%;
+}
+
+.paper-scroller > .paper {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAHUlEQVQYV2NkYGAwBuKzQIwXMBJSAJMfVUidcAQAnUQBC6jEGBUAAAAASUVORK5CYII=');
+    background-color: white;
+    box-shadow: 0 0 5px lightgray;
+	margin: 0;
+	position: relative;
+	display: inline-block;
+	cursor: -webkit-grab;
+}
+
+.svgCanvas{
+}
+
+.modelContainer{
+	position: absolute;
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: auto;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding-top: 10px;
+	text-align: center;
+}
+
+.page-bar{
+	position: absolute;
+	top: 10px;
+	height: 30px;
+	line-height: 30px;
+	padding: 0 10px;
+	background-color: #eee;
+	opacity: 0.8;
+	border-radius: 15px;
+}
+
+.page-num{
+	width:18px;
+	height:18px;
+    line-height: 18px;
+	background-color:#cccccc;
+	display: inline-block;
+	border-radius:50%;
+	margin-right: 10px;
+	color: #fff;
+	text-align: center;
+}
+
+.page-num-selected{
+	width:18px;
+	height:18px;
+	line-height: 18px;
+	background-color:#FFCC00;
+	border-radius:50%;
+	margin-right: 10px;
+	display: inline-block;
+	color: #000;
+	text-align: center;
+}
+
+.msg-tips{
+	position: absolute;
+	top: 10px;
+	left:50%;
+	height: 30px;
+	width: 100px;
+    text-align: center;
+	line-height: 30px;
+	border-radius: 15px;
+	display: none;
+}
+
+.mouse-menu{
+	position: absolute;
+    top: -9999px;
+    left: -9999px;
+}
+
+.menu-value{
+	display: none;
+}
+
+ul{
+list-style-type:none;
+}
+
+.mouse-menu ul {
+	float:left;
+	border:1px solid #979797;
+	background:#f1f1f1;
+	padding:2px;
+	box-shadow:2px 2px 2px rgba(0,0,0,.6);
+}
+
+.mouse-menu ul li{
+	height:24px;
+	cursor:pointer;
+	line-height:24px;
+	white-space:nowrap;
+	padding:0 30px;
+}
+
+.mouse-menu ul li:hover{
+	background-color:#f1f3f6;
+	border-radius:3px;
+	border:1px solid #aecff7;
+	height:22px;
+	line-height:22px;
+	padding:0 29px;
+}
+
+.modelAdorner {
+	position: absolute;
+	display:block;
+	opacity: 0.7;
+	z-index:100;
+}
+.lineOperator {
+	fill: gray;
+	stroke: red;
+	stroke-width: 1;
+	cursor: move;
+	opacity: 0.5;
+}
+.lineMask{
+	fill:white;
+	opacity: 0.9;
+}
+
+.selection-panel {
+    position: absolute;
+    background-color: rgba(56, 155, 226, 0.48);
+    opacity: .3;
+    border: 1px solid rgb(3, 137, 201);
+    overflow: visible;
+	/*top:10px;
+	left:10px;
+	width: 200px;
+	height: 300px;*/
+}
+
+.selection-box {
+	fill:none;
+	stroke:black;
+	stroke-dasharray:2,6;
+}
+
+.solidLine{
+	fill: none;
+	stroke: black;
+	stroke-width: 1;
+	marker-end: url(#markerArrow);
+}
+.solidLine-gray{
+	fill: none;
+	stroke: gray;
+	stroke-width: 1;
+	marker-end: url(#markerArrow);
+}
+.solidLine-red{
+	fill: none;
+	stroke: red;
+	stroke-width: 1;
+	marker-end: url(#markerArrow);
+}
+.solidLine-blue{
+	fill: none;
+	stroke: #6495ED;
+	stroke-width: 1;
+	marker-end: url(#markerArrow_blue);
+}
+.dashedLine{
+	fill: none;
+	stroke: black;
+	stroke-width: 1;
+	stroke-dasharray: 1,3;
+	marker-end: url(#markerArrow);
+}
+.dashedLine-red{
+	fill: none;
+	stroke: red;
+	stroke-width: 1;
+	stroke-dasharray: 1,3;
+	marker-end: url(#markerArrow);
+}
+
+.dashedLine-green{
+	fill: none;
+	stroke: green;
+	stroke-width: 1;
+	stroke-dasharray: 1,3;
+	marker-end: url(#markerArrow_green);
+}
+
+.tangentLine{
+	stroke:gray;
+}

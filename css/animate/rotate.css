@@ -1,0 +1,40 @@
+.rotateY:hover, .rotateY img:hover, .rotateY a:hover, .rotateY a img:hover {
+  -moz-animation: Rotate 1s linear forwards;
+  -webkit-animation: Rotate 1s linear forwards;
+  animation: Rotate 1s linear forwards; }
+
+@keyframes Rotate {
+  0% {
+    transform: rotateY(0deg) scale(1); }
+  25% {
+    transform: rotateY(120deg) scale(1); }
+  50% {
+    transform: rotateY(180deg) scale(1); }
+  75% {
+    transform: rotateY(270deg) scale(1); }
+  100% {
+    transform: rotateY(360deg) scale(1); } }
+@-moz-keyframes Rotate {
+  0% {
+    transform: rotateY(0deg) scale(1); }
+  25% {
+    transform: rotateY(120deg) scale(1); }
+  50% {
+    transform: rotateY(180deg) scale(1); }
+  75% {
+    transform: rotateY(270deg) scale(1); }
+  100% {
+    transform: rotateY(360deg) scale(1); } }
+@-webkit-keyframes Rotate {
+  0% {
+    transform: rotateY(0deg) scale(1); }
+  25% {
+    transform: rotateY(120deg) scale(1); }
+  50% {
+    transform: rotateY(180deg) scale(1); }
+  75% {
+    transform: rotateY(270deg) scale(1); }
+  100% {
+    transform: rotateY(360deg) scale(1); } }
+
+/*# sourceMappingURL=rotate.css.map */

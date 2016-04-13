@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>业务架构</title>
+
+	<link rel="stylesheet" type="text/css" href="../css/drawing-basic.css">
+	<link rel="stylesheet" href="../css/victop.css">
+	<script type="text/javascript" src='../js-src/feidao/config.js'></script>
+	<script type="text/javascript" src='../js-src/dojo/dojo.js'></script>
+	<script type="text/javascript">
+		var drawObj;
+		function submitWPF(type, content) {
+			var param = {};
+			param.MessageType = type;
+			param.MessageContent = content;
+			CCharpExtension.SendMessage(JSON.stringify(param));
+		}
+		function excuteFormWPF(data) {
+			return drawObj.handleWpfMessage(data);
+		}
+
+		require(['feidao/victopDrawing','dojo/domReady'],function(
+			victopDrawing,
+			domReady
+		){
+			//业务架构 shape define
+			var shapeDefine = {
+					'framework.business.uint': {
+						elements: [{
+							svgType: 'path',
+							attrs: {
+								fill:'#6495ED',
+								d:'M0 0 H80 V50 H0 Z'
+							}
+						}],
+						text:{
+							   attrs: {
+								   x:0,
+								   y:0,
+								   dx:10,
+								   dy:30
+						   		}
+					   		},
+						height:'50',
+						width:'80'
+				   },
+				   'framework.business.uint_copy': {
+					   elements: [{
+						   svgType: 'path',
+						   attrs: {
+							   fill:'#FFA500',
+							   d:'M0 0 H80 V50 H0 Z'
+						   }
+					   }],
+					   text:{
+							  attrs: {
+								  x:0,
+								  y:0,
+								  dx:10,
+								  dy:30
+							   }
+						   },
+					   height:'50',
+					   width:'80'
+				  },
+				  'framework.business.uint_combine': {
+					  elements: [{
+						  svgType: 'path',
+						  attrs: {
+							  fill:'#8FBC8F',
+							  d:'M0 30 L40 0 L80 30 L40 60 Z'
+						  }
+					  }],
+					  text:{
+							 attrs: {
+								 x:0,
+								 y:0,
+								 dx:5,
+								 dy:35
+							  }
+						  },
+					  height:'60',
+					  width:'80'
+				 },
+				 'framework.business.business': {
+					 elements: [{
+						 svgType: 'circle',
+						 attrs: {
+							 fill:'white',
+							 stroke:'#D85EAB',
+							 'stroke-width':"2",
+							 r:'38',
+							 cx:'40',
+							 cy:'40'
+						 }
+					 }],
+					 text:{
+							attrs: {
+								x:0,
+								y:0,
+								dx:10,
+								dy:45
+							 }
+						 },
+				 	 height:'80',
+				 	width:'80'
+				},
+			};
+			var lines = [{
+					name:'link1',
+					defaultText:'连接线',
+					businessType:'连接线',
+					class:'solidLine'
+				}];
+			domReady(function(){
+				var params = {
+					width:1200,
+					height:1000,
+					shapeDefine:shapeDefine,
+					lineModels:lines,
+					runInWpf:true,
+					models:[{
+						id:'businessUint',
+						model:'framework.business.uint',
+						type:'业务主体',
+						links:['link1'],
+						defaultText:'业务主体',
+						mouseMenu:'delete,copy'
+					},{
+						id:'businessCombine',
+						model:'framework.business.uint_combine',
+						type:'业务组合',
+						links:['link1'],
+						defaultText:'业务组合',
+						mouseMenu:'delete,copy'
+					},{
+						id:'business',
+						model:'framework.business.business',
+						type:'IMS业务',
+						links:['link1'],
+						defaultText:'IMS业务',
+						mouseMenu:'delete,copy'
+					}]
+				}
+				victopDrawing.initCanvas(params);
+				victopDrawing.submitWPF = submitWPF;
+				drawObj = victopDrawing;
+				victopDrawing.onloadEvent();
+			})
+		});
+	</script>
+</head>
+<body>
+	<!--模具组合-->
+    <div class="stencil-container" style="width:135px;">
+		<div id="stencilContainer" class="modelContainer">
+		</div>
+    </div>
+	<!--画布预定义-->
+	<svg id="svgDefs" xmlns="http://www.w3.org/2000/svg" width="0" height='0'>
+		<defs>
+			<marker id="markerArrow" markerWidth="13" markerHeight="13" refx="10" refy="6" orient="auto">
+				<path d="M2,2 L2,11 L10,6 L2,2" style="fill: #000000;" />
+			</marker>
+		</defs>
+	</svg>
+	<!--画布缩进-->
+	<div class="splitter-container" style="left:135px;">
+		<div class="splitter" id="splitterBtn" fold ='false'>
+			<i class="vicons">&#xe738;</i>
+		</div>
+	</div>
+	<!--画布-->
+    <div class="paper-container" id="svgContainer" style="left:152px;padding-left: 5px; padding-top: 5px;">
+		<div class="paper-scroller" id="svgScroller">
+			<div class="paper" id="svgPaper" style="margin-bottom: 4px; margin-right: 210px;">
+			</div>
+			<div class="selection-panel" id="selectionPanel"></div>
+		</div>
+	</div>
+	<!--分页-->
+	<div class="page-bar" id="pageBar" style="left:160px;"></div>
+	<!--Tips-->
+	<div class="msg-tips" id="tipsDiv"></div>
+	<!--右键菜单 -->
+	<div id="mouseMenu" class="mouse-menu">
+		<ul>
+			<li id='menuDelete' class='menu-value' operate="deleteNode">删除</li>
+			<li id='menuClone' class='menu-value' operate="createCopy">生成副本</li>
+		</ul>
+	</div>
+</body>
+
+</html>

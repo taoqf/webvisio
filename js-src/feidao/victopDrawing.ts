@@ -219,11 +219,11 @@ function registerPageEvent() {
     // 拦截鼠标右键菜单
     document.oncontextmenu = function(e) {
         if (activedPageSvg.SelectedElement) {
-			// 取消全选
-			activedPageSvg.ClearSelectRect();
-			activedPageSvg.SelectService.ClearCollection();
-			activedPageSvg.CreateSelectRect(activedPageSvg.SelectedElement);
-			activedPageSvg.SelectService.SetSelected(activedPageSvg.SelectedElement);
+            // 取消全选
+            activedPageSvg.ClearSelectRect();
+            activedPageSvg.SelectService.ClearCollection();
+            activedPageSvg.CreateSelectRect(activedPageSvg.SelectedElement);
+            activedPageSvg.SelectService.SetSelected(activedPageSvg.SelectedElement);
 
             mouseMenuDiv.style.display = 'block';
             let menuLeft = e.clientX, menuTop = e.clientY;
@@ -841,11 +841,11 @@ export function handleWpfMessage(message): string {
                 break;
             case 'selectElement':
                 selectElement(message['MessageContent']);
-				break;
-			case 'createShapeElement':
+                break;
+            case 'createShapeElement':
                 result = createShapeElement(message['MessageContent']);
-				break;
-			case 'createLineElement':
+                break;
+            case 'createLineElement':
                 result = createLineElement(message['MessageContent']);
             default:
                 break;
@@ -921,7 +921,7 @@ function getLinesByShape(data) {
         let line = lines.sourceLines[i];
         let lineItem = {
             nodeId: line.Id,
-            nodeText: line.Text,
+            nodeText: line.Text || '',
             nodeType: 'line',
             businessType: line.BusinessType,
             businessData: line.BusinessData
@@ -933,7 +933,7 @@ function getLinesByShape(data) {
         let line = lines.targetLines[i];
         let lineItem = {
             nodeId: line.Id,
-            nodeText: line.Text,
+            nodeText: line.Text || '',
             nodeType: 'line',
             businessType: line.BusinessType,
             businessData: line.BusinessData
@@ -962,7 +962,7 @@ function getShapesByLine(data) {
         sourceShape: {
             nodeId: lineItem.Source.Id,
             clonedId: lineItem.Source.ClonedId || '',
-            nodeText: lineItem.Source.Text,
+            nodeText: lineItem.Source.Text || '',
             nodeType: 'shape',
             businessType: lineItem.Source.BusinessType,
             businessData: lineItem.Source.BusinessData
@@ -970,7 +970,7 @@ function getShapesByLine(data) {
         targetShape: lineItem.Target == undefined || null ? '' : {
             nodeId: lineItem.Target.Id,
             clonedId: lineItem.Target.ClonedId || '',
-            nodeText: lineItem.Target.Text,
+            nodeText: lineItem.Target.Text || '',
             nodeType: 'shape',
             businessType: lineItem.Target.BusinessType,
             businessData: lineItem.Target.BusinessData
@@ -990,7 +990,7 @@ function getAllElement(data) {
         let elementItem = {
             nodeId: item.Id,
             clonedId: item.ClonedId || '',
-            nodeText: item.Text,
+            nodeText: item.Text || '',
             nodeType: item.ElementType,
             businessType: item.BusinessType,
             businessData: item.BusinessData
@@ -1050,7 +1050,7 @@ function deleteNodeById(data) {
     let canvasId = data['canvasId'];
     let nodeIds = data['nodeIds'];
     let canvas = getCanvasById(canvasId);
-	var ids = nodeIds.split(',');
+    var ids = nodeIds.split(',');
     canvas.RemoveElementsByIds(ids);
 }
 
@@ -1114,8 +1114,8 @@ function selectElement(data) {
         canvas.ClearSelectRect();
         canvas.CreateSelectRect(element);
     } else {
-		canvas.SelectService.ClearCollection();
-		canvas.ClearSelectRect();
+        canvas.SelectService.ClearCollection();
+        canvas.ClearSelectRect();
         canvas.ActivedLine = element;
     }
     elementSelected = true;
@@ -1124,74 +1124,76 @@ function selectElement(data) {
 
 // 生成图形元素
 export function createShapeElement(data) {
-	let canvasId = data['canvasId'];
-	let businessType = data['businessType'];
-	let positionX = data['positionX'];
-	let positionY = data['positionY'];
+    let canvasId = data['canvasId'];
+    let businessType = data['businessType'];
+    let positionX = data['positionX'];
+    let positionY = data['positionY'];
     let canvas = getCanvasById(canvasId);
 
-	let gElement = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'content' }]);
-	let shapeInfo = matchShapeInfo(businessType);
-	if (!shapeInfo) {
-		return;
-	}
+    let gElement = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'content' }]);
+    let shapeInfo = matchShapeInfo(businessType);
+    if (!shapeInfo) {
+        return;
+    }
 
-	// create svg elements in defined
-	let elements = shapeInfo['elements'];
-	for (let j = 0, count = elements.length; j < count; j++) {
-		let item = elements[j];
-		SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], gElement);
-	}
-	let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], gElement) as HTMLElement;
-	let shapeItem = new SvgElementShapeItem(gElement as SVGSVGElement, canvas);
-	let shapeLinks = matchLinks(shapeInfo['links'], baseLines);
-	shapeItem.Links = shapeLinks;
-	shapeItem.SetTanslate(positionX, positionY);
-	shapeItem.BusinessType = businessType;
-	canvas.PaperFitToContent(shapeItem);
+    // create svg elements in defined
+    let elements = shapeInfo['elements'];
+    for (let j = 0, count = elements.length; j < count; j++) {
+        let item = elements[j];
+        SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], gElement);
+    }
+    let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], gElement) as HTMLElement;
+    let shapeItem = new SvgElementShapeItem(gElement as SVGSVGElement, canvas);
+    let shapeLinks = matchLinks(shapeInfo['links'], baseLines);
+    shapeItem.Links = shapeLinks;
+    shapeItem.SetTanslate(positionX, positionY);
+    shapeItem.BusinessType = businessType;
+    canvas.PaperFitToContent(shapeItem);
 
-	let result = {
-		shape:{
-        nodeId: shapeItem.Id,
-		clonedId: '',
-        nodeText: shapeItem.Text,
-        nodeType: 'shape',
-        businessType: businessType,
-        businessData: shapeItem.BusinessData
-    }};
+    let result = {
+        shape: {
+            nodeId: shapeItem.Id,
+            clonedId: '',
+            nodeText: '',
+            nodeType: 'shape',
+            businessType: businessType,
+            businessData: shapeItem.BusinessData
+        }
+    };
 
-	return JSON.stringify(result);
+    return JSON.stringify(result);
 }
 
 
 // 生成线并连接图形元素
 export function createLineElement(data) {
-	let canvasId = data['canvasId'];
-	let businessType = data['businessType'];
-	let sourceId = data['sourceId'];
-	let targetId = data['targetId'];
-	let canvas = getCanvasById(canvasId);
+    let canvasId = data['canvasId'];
+    let businessType = data['businessType'];
+    let sourceId = data['sourceId'];
+    let targetId = data['targetId'];
+    let canvas = getCanvasById(canvasId);
 
-	let lineId = SvgUtility.uuid();
-	let sourceShape = canvas.GetSvgElementById(sourceId) as SvgElementShapeItem;
-	let targetShape = canvas.GetSvgElementById(targetId) as SvgElementShapeItem;
-	let lineItem = new SvgElementLineItem(canvas, sourceShape,lineId);
-	lineItem.Target = targetShape;
-	let linkInfo = SvgUtility.findItemInArray('businessType', businessType, baseLines);
+    let lineId = SvgUtility.uuid();
+    let sourceShape = canvas.GetSvgElementById(sourceId) as SvgElementShapeItem;
+    let targetShape = canvas.GetSvgElementById(targetId) as SvgElementShapeItem;
+    let lineItem = new SvgElementLineItem(canvas, sourceShape, lineId);
+    lineItem.Target = targetShape;
+    let linkInfo = SvgUtility.findItemInArray('businessType', businessType, baseLines);
 
-	lineItem.InitByData(linkInfo);
-	lineItem.CreateStraightLine();
+    lineItem.InitByData(linkInfo);
+    lineItem.CreateStraightLine();
 
-	let result = {
-		line:{
-        nodeId: lineItem.Id,
-        nodeText: lineItem.Text,
-        nodeType: 'line',
-        businessType: businessType,
-        businessData: lineItem.BusinessData
-    }};
+    let result = {
+        line: {
+            nodeId: lineItem.Id,
+            nodeText: '',
+            nodeType: 'line',
+            businessType: businessType,
+            businessData: lineItem.BusinessData
+        }
+    };
 
-	return JSON.stringify(result);
+    return JSON.stringify(result);
 }
 
 // handle wpf message end
@@ -1219,20 +1221,20 @@ function beforeConnectEvent(canvas, line, targetShape) {
     let sourceShape = line.Source;
     let messageContent = {
         canvasId: canvas.Id,
-        sourceClonedId: sourceShape.ClonedId,
+        sourceClonedId: sourceShape.ClonedId || '',
         sourceNodeId: sourceShape.Id,
-        sourceNodeText: sourceShape.Text,
+        sourceNodeText: sourceShape.Text || '',
         sourceNodeType: sourceShape.ElementType,
         sourceBusinessType: sourceShape.BusinessType,
         sourceBusinessData: sourceShape.BusinessData,
-        targetClonedId: targetShape.ClonedId,
+        targetClonedId: targetShape.ClonedId || '',
         targetNodeId: targetShape.Id,
-        targetNodeText: targetShape.Text,
+        targetNodeText: targetShape.Text || '',
         targetNodeType: targetShape.ElementType,
         targetBusinessType: targetShape.BusinessType,
         targetBusinessData: targetShape.BusinessData,
         lineId: line.Id,
-        lineText: line.Text,
+        lineText: line.Text || '',
         lineNodeType: line.ElementType,
         lineBusinessType: line.BusinessType,
         lineBusinessData: line.BusinessData
@@ -1273,10 +1275,10 @@ function beforeDeleteEvent(canvas) {
         let element = deleteElements[i];
         let item = {
             canvasId: canvas.Id,
-            clonedId: element.ClonedId,
+            clonedId: element.ClonedId || '',
             nodeId: element.Id,
             nodeType: element.ElementType,
-            nodeText: element.Text,
+            nodeText: element.Text || '',
             businessType: element.BusinessType,
             businessData: element.BusinessData
         };
@@ -1299,20 +1301,20 @@ function elementConnectedEvent(canvas, line, targetShape) {
     let sourceShape = line.Source;
     let messageContent = {
         canvasId: canvas.Id,
-        sourceClonedId: sourceShape.ClonedId,
+        sourceClonedId: sourceShape.ClonedId || '',
         sourceNodeId: sourceShape.Id,
-        sourceNodeText: sourceShape.Text,
+        sourceNodeText: sourceShape.Text || '',
         sourceNodeType: sourceShape.ElementType,
         sourceBusinessType: sourceShape.BusinessType,
         sourceBusinessData: sourceShape.BusinessData,
-        targetClonedId: targetShape.ClonedId,
+        targetClonedId: targetShape.ClonedId || '',
         targetNodeId: targetShape.Id,
-        targetNodeText: targetShape.Text,
+        targetNodeText: targetShape.Text || '',
         targetNodeType: targetShape.ElementType,
         targetBusinessType: targetShape.BusinessType,
         targetBusinessData: targetShape.BusinessData,
         lineId: line.Id,
-        lineText: line.Text,
+        lineText: line.Text || '',
         lineNodeType: line.ElementType,
         lineBusinessType: line.BusinessType,
         lineBusinessData: line.BusinessData
@@ -1333,8 +1335,8 @@ function elementAddedEvent(canvas, element) {
             canvas.ClearSelectRect();
             canvas.CreateSelectRect(element);
         } else {
-			canvas.SelectService.ClearCollection();
-			canvas.ClearSelectRect();
+            canvas.SelectService.ClearCollection();
+            canvas.ClearSelectRect();
             canvas.ActivedLine = element;
         }
         canvas.ResetHandlerPanel(element);
@@ -1343,10 +1345,10 @@ function elementAddedEvent(canvas, element) {
     let messageType = "elementAdded";
     let messageContent = {
         canvasId: canvas.Id,
-        clonedId: element.ClonedId,
+        clonedId: element.ClonedId || '',
         nodeId: element.Id,
         nodeType: element.ElementType,
-        nodeText: element.Text,
+        nodeText: element.Text || '',
         businessType: element.BusinessType,
         businessData: element.BusinessData
     };
@@ -1362,10 +1364,10 @@ function elementSelectedEvent(canvas, element) {
     let messageType = "selected";
     let messageContent = {
         canvasId: canvas.Id,
-        clonedId: element.ClonedId,
+        clonedId: element.ClonedId || '',
         nodeId: element.Id,
         nodeType: element.ElementType,
-        nodeText: element.Text,
+        nodeText: element.Text || '',
         businessType: element.BusinessType,
         businessData: element.BusinessData
     };
@@ -1401,10 +1403,10 @@ function elementDeletedEvent(canvas) {
         let element = deleteElements[i];
         let item = {
             canvasId: canvas.Id,
-            clonedId: element.ClonedId,
+            clonedId: element.ClonedId || '',
             nodeId: element.Id,
             nodeType: element.ElementType,
-            nodeText: element.Text,
+            nodeText: element.Text || '',
             businessType: element.BusinessType,
             businessData: element.BusinessData
         };
@@ -1454,9 +1456,9 @@ function beforeElementCloneEvent(canvas, shape) {
     }
     let messageContent = {
         canvasId: canvas.Id,
-        clonedId: shape.ClonedId,
+        clonedId: shape.ClonedId || '',
         nodeId: shape.Id,
-        nodeText: shape.Text,
+        nodeText: shape.Text || '',
         nodeType: shape.ElementType,
         businessType: shape.BusinessType,
         businessData: shape.BusinessData
@@ -1472,10 +1474,10 @@ function elementClonedEvent(canvas, clonedShape) {
     let messageType = "cloned";
     let messageContent = {
         canvasId: canvas.Id,
-        clonedId: clonedShape.ClonedId,
+        clonedId: clonedShape.ClonedId || '',
         nodeId: clonedShape.Id,
         nodeType: clonedShape.ElementType,
-        nodeText: clonedShape.Text,
+        nodeText: clonedShape.Text || '',
         businessType: clonedShape.BusinessType,
         businessData: clonedShape.BusinessData
     };
@@ -1492,20 +1494,20 @@ function beforeBreakConnectionEvent(canvas, line, targetShape) {
     let sourceShape = line.Source;
     let messageContent = {
         canvasId: canvas.Id,
-        sourceClonedId: sourceShape.ClonedId,
+        sourceClonedId: sourceShape.ClonedId || '',
         sourceNodeId: sourceShape.Id,
-        sourceNodeText: sourceShape.Text,
+        sourceNodeText: sourceShape.Text || '',
         sourceNodeType: sourceShape.ElementType,
         sourceBusinessType: sourceShape.BusinessType,
         sourceBusinessData: sourceShape.BusinessData,
         targetClonedId: targetShape.ClonedId,
         targetNodeId: targetShape.Id,
-        targetNodeText: targetShape.Text,
+        targetNodeText: targetShape.Text || '',
         targetNodeType: targetShape.ElementType,
         targetBusinessType: targetShape.BusinessType,
         targetBusinessData: targetShape.BusinessData,
         lineId: line.Id,
-        lineText: line.Text,
+        lineText: line.Text || '',
         lineNodeType: line.ElementType,
         lineBusinessType: line.BusinessType,
         lineBusinessData: line.BusinessData
@@ -1522,14 +1524,14 @@ function breakedConnectionEvent(canvas, line) {
     let sourceShape = line.Source;
     let messageContent = {
         canvasId: canvas.Id,
-        sourceClonedId: sourceShape.ClonedId,
+        sourceClonedId: sourceShape.ClonedId || '',
         sourceNodeId: sourceShape.Id,
-        sourceNodeText: sourceShape.Text,
+        sourceNodeText: sourceShape.Text || '',
         sourceNodeType: sourceShape.ElementType,
         sourceBusinessType: sourceShape.BusinessType,
         sourceBusinessData: sourceShape.BusinessData,
         lineId: line.Id,
-        lineText: line.Text,
+        lineText: line.Text || '',
         lineNodeType: line.ElementType,
         lineBusinessType: line.BusinessType,
         lineBusinessData: line.BusinessData

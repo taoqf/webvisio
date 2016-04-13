@@ -843,10 +843,10 @@ export function handleWpfMessage(message): string {
                 selectElement(message['MessageContent']);
 				break;
 			case 'createShapeElement':
-                createShapeElement(message['MessageContent']);
+                result = createShapeElement(message['MessageContent']);
 				break;
 			case 'createLineElement':
-                createLineElement(message['MessageContent']);
+                result = createLineElement(message['MessageContent']);
             default:
                 break;
         }

@@ -3,49 +3,8 @@ import {SvgElementShapeItem} from './SvgElement';
 import {SvgElementLineItem} from './SvgElement';
 import SvgUtility from './SvgUtility'
 
-export class Rect {
-    private startPoint: Point;
-    private width: Number;
-    private height: Number;
-    constructor(point: Point, width: Number, height: Number) {
-        this.startPoint = point;
-        this.width = width;
-        this.height = height;
-    }
-    get StartPoint() {
-        return this.startPoint;
-    }
-    get Width() {
-        return this.width;
-    }
-    get Heigth() {
-        return this.width;
-    }
-}
-export class Point {
-    private x: Number;
-    private y: Number;
-    public constructor(x: Number, y: Number) {
-        this.x = x;
-        this.y = y;
-    }
-    get X() {
-        return this.x;
-    }
-    get Y() {
-        return this.y;
-    }
-}
 export interface ISelectable {
     isSelected: Boolean;
-}
-export interface IScrollable {
-    CanHorizontallyScroll: Boolean;
-    CanVerticallyScroll: Boolean;
-    GetHorizontalOffset(): Number;
-    GetVerticalOffset(): Number;
-    SetHorizontalOffset(offset: Number);
-    SetVerticalOffset(offset: Number);
 }
 
 export class SelectService {
@@ -102,7 +61,7 @@ export class SelectService {
         return false;
     }
 }
-export class SvgCanvas implements IScrollable {
+export class SvgCanvas {
     //画布宿主元素
     private rootelement: HTMLElement;
     //水平方向是否能滚动
@@ -120,8 +79,6 @@ export class SvgCanvas implements IScrollable {
     public svgCanvasElement: SVGSVGElement;
     //svg 画布
     public groupElement: Element;
-    //视口宽度
-    private viewBoxRect: Rect;
 
     private svgElementBaseCollection: SvgElementBase[] = [];
 
@@ -1028,10 +985,7 @@ export class SvgCanvas implements IScrollable {
         this.id = id
     }
 
-    private setViewBox(rect: Rect) {
-        let viewBoxValue: string = rect.StartPoint.X.toString() + " " + rect.StartPoint.Y.toString() + " " + rect.Width.toString() + " " + rect.Heigth.toString();
-        this.svgCanvasElement.setAttribute("viewBox", viewBoxValue);
-    }
+
     //设置 画布宽度
     set SvgCanvasHeight(newheight: Number) {
         this.svgCanvasElement.setAttribute("height", newheight.toString())
@@ -1055,21 +1009,6 @@ export class SvgCanvas implements IScrollable {
             verticalOffset = new Number(viewBoxArray[1]);
         }
         return verticalOffset;
-    }
-
-    public SetHorizontalOffset(offset: Number) {
-        if (this.viewBoxRect != null) {
-            this.viewBoxRect.StartPoint.X = offset;
-            this.setViewBox(this.viewBoxRect);
-        }
-    }
-
-    public SetVerticalOffset(offset: Number) {
-        if (this.viewBoxRect != null) {
-            this.viewBoxRect.StartPoint.Y = offset;
-            this.setViewBox(this.viewBoxRect);
-        }
-
     }
 
     public SetBackgroundColor(color: string) {

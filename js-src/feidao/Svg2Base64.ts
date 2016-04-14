@@ -87,7 +87,7 @@ function svgAsDataUri(el, options, cb) {
         clone.insertBefore(defs, clone.firstChild);
 
         let svgNode = doctype + outer.innerHTML;
-        let uri = 'data:image/svg+xml;base64,'+ window.btoa(reEncode(svgNode));
+        let uri = 'data:image/svg+xml;base64,' + window.btoa(reEncode(svgNode));
         if (cb) {
             cb(uri);
         }
@@ -160,7 +160,7 @@ function styles(el, selectorRemap) {
     let css = "";
     let sheets = document.styleSheets;
     for (let i = 0; i < sheets.length; i++) {
-		let rules;
+        let rules;
         try {
             let sheetItem = sheets[i] as CSSStyleSheet;
             rules = sheetItem.cssRules;

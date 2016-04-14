@@ -16,9 +16,7 @@ export default class SvgUtility {
     }
     // 将shape转换为path 数据
     public static ConvertToPathData(node) {
-
-        let tagName = node.tagName.toUpperCase();
-        if (tagName == 'G') {
+        if (node.tagName && node.tagName.toUpperCase() == 'G') {
             node = node.childNodes[0];
         }
         return flatten(node);
@@ -89,9 +87,9 @@ export default class SvgUtility {
     }
 
     // 返回两个path的交点
-    public static FindIntersection(element: SvgElementShapeItem, linePath) {
-        let elementPath = this.ConvertToPathData(element.SvgElement);
-        let intersection = pathIntersection(linePath, elementPath);
+    public static FindIntersection(element, linePath) {
+        let elementPath = this.ConvertToPathData(element);
+        let intersection = pathIntersection(elementPath, linePath);
         if (intersection.length > 0) {
             return intersection;
         } else {
@@ -181,49 +179,49 @@ export default class SvgUtility {
         return { scale: scale, height: height };
     }
 
-	// 将svg 转换为 base64 Img code
-    public static GetSvgAsImg(canvas,baseLines,svgDefs,callback) {
-		let elements = canvas.GetSvgElementsInCanvas();
-		for(let i = 0, lines = baseLines.length; i < lines; i++){
-			let className = baseLines[i]['class'];
-			let businessType = baseLines[i]['businessType'];
-			let lineItem;
-			for(let j =0, len = elements.length; j < len; j++){
-				let item = elements[j];
-				if(item['ElementType'] == 'line' && item['BusinessType'] == businessType){
-					lineItem = item.LineSvg;
-					break;
-				}
-			}
-			if(lineItem){
-				this.BuildStyleCache(lineItem);
-			}
-		}
-		let svgNode = canvas.svgCanvasElement.cloneNode(true);
+    // 将svg 转换为 base64 Img code
+    public static GetSvgAsImg(canvas, baseLines, svgDefs, callback) {
+        let elements = canvas.GetSvgElementsInCanvas();
+        for (let i = 0, lines = baseLines.length; i < lines; i++) {
+            let className = baseLines[i]['class'];
+            let businessType = baseLines[i]['businessType'];
+            let lineItem;
+            for (let j = 0, len = elements.length; j < len; j++) {
+                let item = elements[j];
+                if (item['ElementType'] == 'line' && item['BusinessType'] == businessType) {
+                    lineItem = item.LineSvg;
+                    break;
+                }
+            }
+            if (lineItem) {
+                this.BuildStyleCache(lineItem);
+            }
+        }
+        let svgNode = canvas.svgCanvasElement.cloneNode(true);
 
-		let nodes = svgNode.childNodes[0].childNodes;
-		// 将调用class的线元素添加具体的style
-		for(let i = 0; i < nodes.length; i++){
-			let nodeItem = nodes[i];
-			if(nodeItem.nodeName=='g' && nodeItem.getAttribute('class') =='line'){
-				console.log(nodeItem);
-				let lineNode = nodeItem.firstChild;
-				let lineClass = lineNode.getAttribute('class');
-				let lineStyles = this.findItemInArray('class',lineClass,this.lineStyleCache)['style'];
-				for (let key in lineStyles) {
-	                lineNode.setAttribute(key, lineStyles[key]);
-	            }
-			}
-		}
-		if(svgDefs){
-			svgNode.appendChild(svgDefs);
-		}
-		svgNode.setAttribute('style','background:white');
-		// TODO 只导出有效大小的画布，需重设宽高，scale和每个元素的translate
-		svg2Base64(svgNode,'',callback);
+        let nodes = svgNode.childNodes[0].childNodes;
+        // 将调用class的线元素添加具体的style
+        for (let i = 0; i < nodes.length; i++) {
+            let nodeItem = nodes[i];
+            if (nodeItem.nodeName == 'g' && nodeItem.getAttribute('class') == 'line') {
+                console.log(nodeItem);
+                let lineNode = nodeItem.firstChild;
+                let lineClass = lineNode.getAttribute('class');
+                let lineStyles = this.findItemInArray('class', lineClass, this.lineStyleCache)['style'];
+                for (let key in lineStyles) {
+                    lineNode.setAttribute(key, lineStyles[key]);
+                }
+            }
+        }
+        if (svgDefs) {
+            svgNode.appendChild(svgDefs);
+        }
+        svgNode.setAttribute('style', 'background:white');
+        // TODO 只导出有效大小的画布，需重设宽高，scale和每个元素的translate
+        svg2Base64(svgNode, '', callback);
     }
 
-	// 构造 line style cache
+    // 构造 line style cache
     private static BuildStyleCache(node) {
         let className = node.getAttribute('class');
         for (let i = 0, len = this.lineStyleCache.length; i < len; i++) {
@@ -232,27 +230,31 @@ export default class SvgUtility {
             }
         }
 
-		let style = document.defaultView.getComputedStyle(node);
-		let fill = 'none';
+        let style = document.defaultView.getComputedStyle(node);
+        let fill = 'none';
         let stroke = style['stroke'];
         let strokeWidth = style['stroke-width'];
         let strokeDash = style['stroke-dasharray'];
         let marker = style['marker-end'];
 
-		this.lineStyleCache.push({'class':className,'style':{fill:fill,stroke:stroke,
-			'stroke-width':strokeWidth,'stroke-dasharray':strokeDash,'marker-end':marker}});
+        this.lineStyleCache.push({
+            'class': className, 'style': {
+            fill: fill, stroke: stroke,
+            'stroke-width': strokeWidth, 'stroke-dasharray': strokeDash, 'marker-end': marker
+        }
+        });
     }
 
-	// 查找对象数组中的值
-	public static findItemInArray(key, itemVal, array) {
-	    if (!key || !itemVal || !array) {
-	        return;
-	    }
-	    let len = array.length;
-	    for (let i = 0; i < len; i++) {
-	        if (array[i][key] == itemVal) {
-	            return array[i];
-	        }
-	    }
-	}
+    // 查找对象数组中的值
+    public static findItemInArray(key, itemVal, array) {
+        if (!key || !itemVal || !array) {
+            return;
+        }
+        let len = array.length;
+        for (let i = 0; i < len; i++) {
+            if (array[i][key] == itemVal) {
+                return array[i];
+            }
+        }
+    }
 }

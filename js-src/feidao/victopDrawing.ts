@@ -49,9 +49,11 @@ function initStencilArea(models) {
             { attr: 'height', val: shapeInfo['height'] }, { attr: 'style', val: 'margin:auto;' }, { attr: 'display', val: 'block' }];
         let svgNode = SvgUtility.CreateSvgElement('svg', svgAttrs, stencilContainer);
         let globalNode = SvgUtility.CreateSvgElement('g', gAttrs, svgNode);
+        // shape global
+        let globalShape = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'shape' }], globalNode);
         for (let j = 0, count = shapes.length; j < count; j++) {
             let item = shapes[j];
-            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], globalNode);
+            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], globalShape);
         }
         let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], globalNode) as HTMLElement;
         stencilContainer.appendChild(svgNode);
@@ -355,7 +357,7 @@ function registerPageEvent() {
 }
 
 // 导出页面数据
-function exportPageData() {
+export function exportPageData() {
     let exportData = {};
     if (canvasCollection.length == 0) {
         return;
@@ -425,7 +427,7 @@ function getCanvasData(canvas) {
 }
 
 // 导入数据
-function importPageData(data) {
+export function importPageData(data) {
     if (!data) {
         return;
     }
@@ -453,7 +455,7 @@ function importPageData(data) {
 }
 
 // 导入模板数据
-function importTemplateData(data) {
+export function importTemplateData(data) {
     if (typeof (data) == 'string') {
         data = JSON.parse(data);
     }
@@ -478,16 +480,22 @@ function importCanvasByData(data, isTemplate?) {
     }
     for (let i = 0; i < shapes.length; i++) {
         let shape = shapes[i];
-        let gElement = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'content' }]);
         let shapeInfo = matchShapeInfo(shape['type']);
         if (!shapeInfo) {
             continue;
         }
 
+        // 去除重复元素
+        if (isTemplate && svgCanvas.GetSvgElementById(shape['id'])) {
+            continue
+        }
+        let gElement = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'content' }]);
+        var globalShape = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'shape' }], gElement);
+
         let elements = shapeInfo['elements'];
         for (let j = 0, count = elements.length; j < count; j++) {
             let item = elements[j];
-            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], gElement);
+            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], globalShape);
         }
         let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], gElement) as HTMLElement;
         let shapeItem = new SvgElementShapeItem(gElement as SVGSVGElement, svgCanvas, shape['id']);
@@ -501,11 +509,19 @@ function importCanvasByData(data, isTemplate?) {
             svgCanvas.SelectService.AddSelected(shapeItem);
             svgCanvas.CreateSelectRect(shapeItem);
             svgCanvas.PaperFitToContent(shapeItem)
+            elementAddedEvent(svgCanvas, shapeItem);
         }
     }
 
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
+        if (!SvgUtility.findItemInArray('businessType', line['type'], baseLines)) {
+            continue;
+        }
+        // 去除重复元素
+        if (isTemplate && svgCanvas.GetSvgElementById(line['id'])) {
+            continue
+        }
         let sourceId = line['sourceId'];
         let targetId = line['targetId'];
         let opreatePoints = line['opreatePoints'];
@@ -522,6 +538,10 @@ function importCanvasByData(data, isTemplate?) {
         lineItem.SetOperateOffset();
         lineItem.UpdateLinePath(true);
         lineItem.BusinessData = line['businessData'];
+        if (isTemplate) {
+            svgCanvas.PaperFitToContent(lineItem)
+            elementAddedEvent(svgCanvas, lineItem);
+        }
     }
     svgCanvas.ResetHandlerPanel();
 }
@@ -807,6 +827,9 @@ export function handleWpfMessage(message): string {
             case "importData":
                 importPageData(message['MessageContent']['content']);
                 break;
+            case "importTemplateData":
+                importTemplateData(message['MessageContent']['content']);
+                break;
             case "getLinesByShape":
                 result = getLinesByShape(message['MessageContent']);
                 break;
@@ -1025,9 +1048,10 @@ function changeElement(data) {
         let shapes = shapeInfo['elements'];
         let gAttrs = [{ attr: 'class', val: 'Content' }, { attr: 'transform', val: transform }];
         let globalNode = SvgUtility.CreateSvgElement('g', gAttrs, canvas.groupElement);
+        let globalShape = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'shape' }], globalNode);
         for (let j = 0, count = shapes.length; j < count; j++) {
             let item = shapes[j];
-            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], globalNode);
+            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], globalShape);
         }
         let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], globalNode) as HTMLElement;
         if (targetInfo['showText']) {
@@ -1131,6 +1155,7 @@ export function createShapeElement(data) {
     let canvas = getCanvasById(canvasId);
 
     let gElement = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'content' }]);
+    let globalShape = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'shape' }], gElement);
     let shapeInfo = matchShapeInfo(businessType);
     if (!shapeInfo) {
         return;
@@ -1140,7 +1165,7 @@ export function createShapeElement(data) {
     let elements = shapeInfo['elements'];
     for (let j = 0, count = elements.length; j < count; j++) {
         let item = elements[j];
-        SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], gElement);
+        SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], globalShape);
     }
     let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], gElement) as HTMLElement;
     let shapeItem = new SvgElementShapeItem(gElement as SVGSVGElement, canvas);
@@ -1176,10 +1201,12 @@ export function createLineElement(data) {
     let lineId = SvgUtility.uuid();
     let sourceShape = canvas.GetSvgElementById(sourceId) as SvgElementShapeItem;
     let targetShape = canvas.GetSvgElementById(targetId) as SvgElementShapeItem;
+    if (!sourceShape || !targetShape) {
+        return;
+    }
     let lineItem = new SvgElementLineItem(canvas, sourceShape, lineId);
     lineItem.Target = targetShape;
     let linkInfo = SvgUtility.findItemInArray('businessType', businessType, baseLines);
-
     lineItem.InitByData(linkInfo);
     lineItem.CreateStraightLine();
 

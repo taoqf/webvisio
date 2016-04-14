@@ -112,13 +112,13 @@ export class SvgElementBase implements ISelectable {
         return this.businessData;
     }
 
-	set IsSelected(selected:boolean){
-		this.isSelected = selected;
-	}
+    set IsSelected(selected: boolean) {
+        this.isSelected = selected;
+    }
 
-	get IsSelected(){
-		return this.isSelected;
-	}
+    get IsSelected() {
+        return this.isSelected;
+    }
 }
 export class SvgElementShapeItem extends SvgElementBase {
     private isDrag: boolean;
@@ -127,8 +127,8 @@ export class SvgElementShapeItem extends SvgElementBase {
     private translate: number[];
     private links: Object[];
     private clonedId: string = '';
-	private relativeOffsetX:number;//相对偏移
-	private relativeOffsetY:number;
+    private relativeOffsetX: number;//相对偏移
+    private relativeOffsetY: number;
     constructor(svgElement: SVGSVGElement, svgCanvas: SvgCanvas, id?: string) {
         super(svgElement, svgCanvas, id);
         this.elementType = 'shape';
@@ -156,40 +156,40 @@ export class SvgElementShapeItem extends SvgElementBase {
         this.svgElement.onmouseup = (evt: MouseEvent) => { this.EndDrag(evt); };
     }
 
-	// mousedown 事件
+    // mousedown 事件
     public OnMouseDown(evt: MouseEvent): void {
-		this.svgCanvas.ResetHandlerPanel();
+        this.svgCanvas.ResetHandlerPanel();
         this.svgCanvas.ElementClicked = true;
         this.svgElement.setAttribute('cursor', 'move');
         let svgElementRect = this.svgElement.getBoundingClientRect();
         this.HorizontalOffset = evt.clientX - svgElementRect.left;
         this.VerticalOffset = evt.clientY - svgElementRect.top;
-		if (this.svgCanvas.ActivedLine && !this.svgCanvas.ActivedLine.LineSvg) {
-			this.svgCanvas.ActivedLine.RemoveTempLines(true);
-		}
-		this.svgCanvas.groupElement.appendChild(this.svgElement);
+        if (this.svgCanvas.ActivedLine && !this.svgCanvas.ActivedLine.LineSvg) {
+            this.svgCanvas.ActivedLine.RemoveTempLines(true);
+        }
+        this.svgCanvas.groupElement.appendChild(this.svgElement);
 
-		let ctrlKey = evt.ctrlKey;
-		if (ctrlKey){
-			if(!this.isSelected){
-				this.svgCanvas.SelectService.AddSelected(this);
-				this.svgCanvas.CreateSelectRect(this);
-			} else {
-				this.svgCanvas.SelectService.ReomveSelected(this);
-				this.svgCanvas.ReomveSelectRect(this);
-			}
-			return;
-		}
-		this.isDrag = true;
-		// 当该元素不在所选元素中的时候，移除所有选中元素，并将该元素置为选中状态
-		if (!this.svgCanvas.SelectService.HasSelectedItem(this)){
-			this.svgCanvas.ClearSelectRect();
-			this.svgCanvas.CreateSelectRect(this);
-			this.svgCanvas.SelectService.ClearCollection();
-			this.svgCanvas.SelectService.SetSelected(this);
-		} else {
-			this.svgCanvas.updateSelectedElementsOffset(this);
-		}
+        let ctrlKey = evt.ctrlKey;
+        if (ctrlKey) {
+            if (!this.isSelected) {
+                this.svgCanvas.SelectService.AddSelected(this);
+                this.svgCanvas.CreateSelectRect(this);
+            } else {
+                this.svgCanvas.SelectService.ReomveSelected(this);
+                this.svgCanvas.ReomveSelectRect(this);
+            }
+            return;
+        }
+        this.isDrag = true;
+        // 当该元素不在所选元素中的时候，移除所有选中元素，并将该元素置为选中状态
+        if (!this.svgCanvas.SelectService.HasSelectedItem(this)) {
+            this.svgCanvas.ClearSelectRect();
+            this.svgCanvas.CreateSelectRect(this);
+            this.svgCanvas.SelectService.ClearCollection();
+            this.svgCanvas.SelectService.SetSelected(this);
+        } else {
+            this.svgCanvas.updateSelectedElementsOffset(this);
+        }
 
         this.svgCanvas.ResetHandlerPanel(this);
 
@@ -199,16 +199,16 @@ export class SvgElementShapeItem extends SvgElementBase {
 
         this.svgCanvas.SelectedElement = this;
     }
-	// mousemove 事件
+    // mousemove 事件
     public OnDrag(evt: MouseEvent): void {
         if (this.isDrag) {
             this.svgCanvas.ResetHandlerPanel();
             this.svgCanvas.ElementMoving = true;
         }
     }
-	// mouseup 事件
+    // mouseup 事件
     public EndDrag(evt: MouseEvent): void {
-		this.isDrag = false;
+        this.isDrag = false;
         this.HorizontalOffset = 0;
         this.VerticalOffset = 0;
         this.svgElement.setAttribute('cursor', 'default');
@@ -220,7 +220,7 @@ export class SvgElementShapeItem extends SvgElementBase {
         this.GetElementLines();
     }
 
-	// 获取与该图形相关的线
+    // 获取与该图形相关的线
     public GetElementLines() {
         let allElements = SvgCanvas.CurrentCanvas.GetSvgElementsInCanvas();
         let sourcetlines = [];
@@ -241,12 +241,32 @@ export class SvgElementShapeItem extends SvgElementBase {
             'targetLines': targetlines as SvgElementLineItem[]
         };
     }
-	// 设置translate
+    // 设置translate
     public SetTanslate(x: number, y: number) {
-		x = Number(x.toFixed(2));
-		y = Number(y.toFixed(2));
+        x = Number(x.toFixed(2));
+        y = Number(y.toFixed(2));
         super.SetTanslate(x, y);
         this.translate = [x, y];
+    }
+
+    // 获取图形元素组 g
+    public GetShapeGroup() {
+        return this.svgElement.firstChild as SVGSVGElement;
+    }
+
+    // 获取第一个图形元素
+    public GetFirstShapeElement() {
+        return this.svgElement.firstChild.firstChild as SVGSVGElement;
+    }
+
+    // 获取图形组的bbox
+    public GetShapeBBox() {
+        let shapeGroup = this.GetShapeGroup();
+        let bbox = shapeGroup.getBBox();
+        let clientRect = shapeGroup.getBoundingClientRect();
+        bbox.width = clientRect.width;
+        bbox.height = clientRect.height;
+        return bbox;
     }
 
     set Links(links: Object[]) {
@@ -278,22 +298,23 @@ export class SvgElementShapeItem extends SvgElementBase {
         this.SetColor('#FFA500');
     }
 
-	get RelativeOffsetX(){
-		return this.relativeOffsetX;
-	}
+    get RelativeOffsetX() {
+        return this.relativeOffsetX;
+    }
 
-	set RelativeOffsetX(x:number){
-		this.relativeOffsetX = x;
-	}
+    set RelativeOffsetX(x: number) {
+        this.relativeOffsetX = x;
+    }
 
-	get RelativeOffsetY(){
-		return this.relativeOffsetY;
-	}
+    get RelativeOffsetY() {
+        return this.relativeOffsetY;
+    }
 
-	set RelativeOffsetY(y:number){
-		this.relativeOffsetY = y;
-	}
+    set RelativeOffsetY(y: number) {
+        this.relativeOffsetY = y;
+    }
 
+    // 设置text
     public SetText(text: String, isHide?: boolean) {
         let nodes = this.svgElement.childNodes;
         for (let i = 0; i < nodes.length; i++) {
@@ -313,8 +334,9 @@ export class SvgElementShapeItem extends SvgElementBase {
         }
     }
 
+    // 设置图形颜色
     public SetColor(color) {
-        let firstChild = this.svgElement.firstChild as HTMLElement;
+        let firstChild = this.GetFirstShapeElement();
         firstChild.setAttribute('fill', color);
     }
 }
@@ -391,13 +413,13 @@ export class SvgElementLineItem extends SvgElementBase {
         }
 
         let path = SvgUtility.BuildBezierPath(startPoint, middlePoint, endPoint, canvasScale);
-        let startIntersection = SvgUtility.FindIntersection(this.source, path);
+        let startIntersection = SvgUtility.FindIntersection(this.source.GetFirstShapeElement(), path);
         if (startIntersection) {
             startPoint = [startIntersection[0]['x'] / canvasScale, startIntersection[0]['y'] / canvasScale];
         }
 
         if (this.target) {
-            let endIntersection = SvgUtility.FindIntersection(this.target, path);
+            let endIntersection = SvgUtility.FindIntersection(this.target.GetFirstShapeElement(), path);
             if (endIntersection) {
                 endPoint = [endIntersection[0]['x'] / canvasScale, endIntersection[0]['y'] / canvasScale];
                 this.UpdateOperatePoints(null, endPoint);
@@ -423,8 +445,7 @@ export class SvgElementLineItem extends SvgElementBase {
             return;
         }
         let x1, x2, y1, y2;
-        let firstChild = this.source.SvgElement.firstChild as SVGSVGElement;
-        let bbox = firstChild.getBBox();
+        let bbox = this.source.GetShapeBBox();
         let elementWidth = bbox.width;
         let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
         x1 = centerPoint[0] - elementWidth / 2;
@@ -433,7 +454,7 @@ export class SvgElementLineItem extends SvgElementBase {
         y2 = centerPoint[1] - elementWidth;
         let path = 'M ' + centerPoint[0] + ',' + centerPoint[1] + 'C' + x1 + ',' + y1 + ' ' + x2 + ',' + y2 + ' ' + centerPoint[0] + ',' + centerPoint[1];
 
-        let startIntersection = SvgUtility.FindIntersection(this.source, path);
+        let startIntersection = SvgUtility.FindIntersection(this.source.GetFirstShapeElement(), path);
         if (startIntersection && startIntersection.length == 2) {
             let startPoint = startIntersection[0];
             let endPoint = startIntersection[1];
@@ -455,11 +476,11 @@ export class SvgElementLineItem extends SvgElementBase {
         }
     }
 
-	// 更新self line
+    // 更新self line
     private UpdateSelfLine() {
         let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
         let path = 'M ' + centerPoint[0] + ',' + centerPoint[1] + 'C' + this.operatePoints[0][0] + ',' + this.operatePoints[0][1] + ' ' + this.operatePoints[1][0] + ',' + this.operatePoints[1][1] + ' ' + centerPoint[0] + ',' + centerPoint[1];
-        let startIntersection = SvgUtility.FindIntersection(this.source, path);
+        let startIntersection = SvgUtility.FindIntersection(this.source.GetFirstShapeElement(), path);
         if (startIntersection && startIntersection.length == 2) {
             let startPoint = startIntersection[0];
             let endPoint = startIntersection[1];
@@ -487,39 +508,39 @@ export class SvgElementLineItem extends SvgElementBase {
         }
     }
 
-	// 构造直线
-	public CreateStraightLine(){
-		if(!this.target){
-			return;
-		}
-		let canvasScale = this.svgCanvas.CanvasScale;
-		let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
-		let targetCenterPoint = SvgUtility.GetElementCenterPoint(this.target);
+    // 构造直线
+    public CreateStraightLine() {
+        if (!this.target) {
+            return;
+        }
+        let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
+        let targetCenterPoint = SvgUtility.GetElementCenterPoint(this.target);
 
-		let startPoint,endPoint;
+        let startPoint, endPoint;
 
-		let path = 'M' + centerPoint[0] * canvasScale + ',' + centerPoint[1] * canvasScale +
+        let path = 'M' + centerPoint[0] * canvasScale + ',' + centerPoint[1] * canvasScale +
             ' L' + targetCenterPoint[0] * canvasScale + ',' + targetCenterPoint[1] * canvasScale;
-		let startIntersection = SvgUtility.FindIntersection(this.source, path);
-		let endIntersection = SvgUtility.FindIntersection(this.target, path);
-		if (startIntersection) {
-			startPoint = [startIntersection[0]['x'] / canvasScale, startIntersection[0]['y'] / canvasScale];
-		}
-		if (endIntersection) {
-			endPoint = [endIntersection[0]['x'] / canvasScale, endIntersection[0]['y'] / canvasScale];
-		}
-		if (startPoint && endPoint){
-			let middlePoint = [(startPoint[0]+endPoint[0])/2, (startPoint[1]+endPoint[1])/2];
-			this.UpdateOperatePoints(middlePoint,endPoint);
-			let linePath =  'M' + startPoint[0] + ',' + startPoint[1] + ' L' + endPoint[0] + ',' + endPoint[1] ;
-			this.lineSvg.setAttribute('d', linePath);
-	        this.pathZone.setAttribute('d', linePath);
-			this.textSvg.setAttribute('dx', middlePoint[0]);
-	        this.textSvg.setAttribute('dy', middlePoint[1]);
-			this.svgCanvas.ResetHandlerPanel();
-		}
-	}
-	// 更新操作点
+        let startIntersection = SvgUtility.FindIntersection(this.source.GetFirstShapeElement(), path);
+        let endIntersection = SvgUtility.FindIntersection(this.target.GetFirstShapeElement(), path);
+        if (startIntersection) {
+            startPoint = [startIntersection[0]['x'] / canvasScale, startIntersection[0]['y'] / canvasScale];
+        }
+        if (endIntersection) {
+            endPoint = [endIntersection[0]['x'] / canvasScale, endIntersection[0]['y'] / canvasScale];
+        }
+        if (startPoint && endPoint) {
+            let middlePoint = [(startPoint[0] + endPoint[0]) / 2, (startPoint[1] + endPoint[1]) / 2];
+            this.UpdateOperatePoints(middlePoint, endPoint);
+            let linePath = 'M' + startPoint[0] + ',' + startPoint[1] + ' L' + endPoint[0] + ',' + endPoint[1];
+            this.lineSvg.setAttribute('d', linePath);
+            this.pathZone.setAttribute('d', linePath);
+            this.textSvg.setAttribute('dx', middlePoint[0]);
+            this.textSvg.setAttribute('dy', middlePoint[1]);
+            this.svgCanvas.ResetHandlerPanel();
+        }
+    }
+    // 更新操作点
     public UpdateOperatePoints(middlePoint: number[], endPoint: number[]) {
         if (middlePoint) {
             this.operatePoints[0][0] = parseFloat(middlePoint[0].toFixed(2));
@@ -542,7 +563,7 @@ export class SvgElementLineItem extends SvgElementBase {
         ]
     }
 
-	// 隐藏切线操作线
+    // 隐藏切线操作线
     public HideTangentLines() {
         if (this.tangentLines && this.tangentLines.length > 0) {
             this.tangentLines[0].setAttribute('display', 'none');
@@ -550,7 +571,7 @@ export class SvgElementLineItem extends SvgElementBase {
         }
     }
 
-	// 显示切线操作线
+    // 显示切线操作线
     public ShowTangentLines() {
         if (this.tangentLines && this.tangentLines.length > 0) {
             this.tangentLines[0].setAttribute('display', 'block');
@@ -558,7 +579,7 @@ export class SvgElementLineItem extends SvgElementBase {
         }
     }
 
-	// 创建候选线
+    // 创建候选线
     private CreateTempLines() {
         if (!this.source || !this.source.Links) {
             return;
@@ -568,8 +589,7 @@ export class SvgElementLineItem extends SvgElementBase {
         let angle = Math.PI / 6;
         let links = this.source.Links;
         let gElement = this.svgElement;
-        let firstChild = this.source.SvgElement.firstChild as SVGSVGElement;
-        let bbox = firstChild.getBBox();
+        let bbox = this.source.GetShapeBBox();
         let elementWidth = bbox.width;
         let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
         let oddCount = links.length % 2 == 0;
@@ -603,6 +623,7 @@ export class SvgElementLineItem extends SvgElementBase {
                 let cy: number = (evt['clientY'] - svgCanvasRect.top) / me.svgCanvas.CanvasScale;
                 me.RemoveTempLines();
                 me.CreateRealLine(cx, cy, links[lineIdx]);
+                notifyAddedEvent(me.svgCanvas, me);
                 me.isDrag = true;
                 me.dragType = 'end';
                 // me.svgCanvas.SelectedElement = me;//放在added事件中去选中该线
@@ -611,7 +632,7 @@ export class SvgElementLineItem extends SvgElementBase {
             let linePoints = 'M' + centerPoint[0] * canvasScale + ',' + centerPoint[1] * canvasScale +
                 ' L' + x * canvasScale + ',' + y * canvasScale;
 
-            let startAxis = SvgUtility.FindIntersection(this.source, linePoints);
+            let startAxis = SvgUtility.FindIntersection(this.source.GetFirstShapeElement(), linePoints);
 
             if (!startAxis) {
                 continue;
@@ -639,15 +660,14 @@ export class SvgElementLineItem extends SvgElementBase {
     private CreateRealLine(endX, endY, linkInfo) {
         let me = this;
         me.BusinessType = linkInfo.businessType || '';
-        let firstChild = this.source.SvgElement.firstChild as SVGSVGElement;
-        let bbox = firstChild.getBBox();
+        let bbox = this.source.GetShapeBBox();
         let elementWidth = bbox.width;
         let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
         let canvasScale = this.svgCanvas.CanvasScale;
         let linePoints = 'M' + centerPoint[0] * canvasScale + ',' + centerPoint[1] * canvasScale +
             ' L' + endX * canvasScale + ',' + endY * canvasScale;
 
-        let startAxis = SvgUtility.FindIntersection(this.source, linePoints);
+        let startAxis = SvgUtility.FindIntersection(this.source.GetFirstShapeElement(), linePoints);
         if (!startAxis) {
             return;
         }
@@ -665,7 +685,7 @@ export class SvgElementLineItem extends SvgElementBase {
         this.pathZone = SvgUtility.CreateSvgElement('path', zoneAttrs, gElement);
 
         this.pathZone.addEventListener("mousedown", function() {
-			me.svgCanvas.groupElement.appendChild(me.svgElement);
+            me.svgCanvas.groupElement.appendChild(me.svgElement);
             me.svgCanvas.ResetHandlerPanel();
             me.svgCanvas.ResetHandlerPanel(me);
             if (me.svgCanvas.ActivedLine) {
@@ -697,10 +717,9 @@ export class SvgElementLineItem extends SvgElementBase {
         this.SetOperateOffset();
         this.OperateHeight = 0;
         this.OperateScale = 0.5;
-        notifyAddedEvent(this.svgCanvas, this);
     }
 
-	// 移除候选线
+    // 移除候选线
     public RemoveTempLines(removeSelf?: boolean) {
         for (let i = 0; i < this.tempLines.length; i++) {
             let tempItem = this.tempLines[i];
@@ -717,7 +736,7 @@ export class SvgElementLineItem extends SvgElementBase {
         this.SvgCanvas.HideLineMaskSvg();
     }
 
-	// 构造切线操作线
+    // 构造切线操作线
     private CreateTangentLine(startPoint, endPoint) {
         let linePath = 'M' + startPoint[0] + ',' + startPoint[1] + ' L' + endPoint[0] + ',' + endPoint[1];
         let lineAttrs = [{ attr: 'd', val: linePath }, { attr: 'class', val: 'tangentLine' }];
@@ -737,12 +756,12 @@ export class SvgElementLineItem extends SvgElementBase {
         }
     }
 
-	public RemoveTarget(){
-		if (!this.target){
-			return;
-		}
-		this.target = null;
-	}
+    public RemoveTarget() {
+        if (!this.target) {
+            return;
+        }
+        this.target = null;
+    }
 
     get LineSvg() {
         return this.lineSvg;
@@ -803,4 +822,29 @@ export class SvgElementLineItem extends SvgElementBase {
         return this.operateOffset;
     }
 
+}
+
+export class SvgElementContainerItem extends SvgElementBase {
+    constructor(svgElement: SVGSVGElement, svgCanvas: SvgCanvas, id?: string) {
+        // 构造容器 svgElement
+
+
+
+        super(svgElement, svgCanvas, id);
+        this.elementType = 'container';
+
+        let text = '';
+        this.svgElement.setAttribute('cursor', 'default');
+
+        //元素加载事件
+        this.RegisterEvent();
+
+    }
+
+    // 注册事件
+    public RegisterEvent() {
+        // this.svgElement.onmousedown = (evt: MouseEvent) => { this.OnMouseDown(evt); };
+        // this.svgElement.onmousemove = (evt: MouseEvent) => { this.OnDrag(evt); };
+        // this.svgElement.onmouseup = (evt: MouseEvent) => { this.EndDrag(evt); };
+    }
 }

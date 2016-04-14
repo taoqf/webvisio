@@ -49,7 +49,7 @@ export class SelectService {
             }
         }
     }
-	// 判断是否包含元素
+    // 判断是否包含元素
     public HasSelectedItem(able: ISelectable) {
         let len = this.ISelectableCollection.length;
         for (let i = 0; i < len; i++) {
@@ -224,8 +224,7 @@ export class SvgCanvas {
     OnMousemove(evt: MouseEvent) {
         let svgCanvasRect = this.svgCanvasElement.getBoundingClientRect();
         if (this.activedShape && this.elementMoving) {
-            let firstChild = this.activedShape.SvgElement.firstChild as SVGSVGElement;
-            let bbox = firstChild.getBBox();
+            let bbox = this.activedShape.GetShapeBBox();
             let x: number = (evt.clientX - svgCanvasRect.left - this.activedShape.Offset.H || 0 - bbox.x) / this.canvasScale;
             let y: number = (evt.clientY - svgCanvasRect.top - this.activedShape.Offset.V || 0 - bbox.y) / this.canvasScale;
 
@@ -280,28 +279,29 @@ export class SvgCanvas {
                 let shapes = this.GetSvgElementsInCanvas();
                 this.targetShape = null;
                 for (let i = 0; i < shapes.length; i++) {
-                    let shapeItem = shapes[i];
-                    if (shapeItem.ElementType != 'shape') {
+                    if (shapes[i].ElementType != 'shape') {
                         continue;
-                    } else if (shapeItem == this.activedShape) {
-                        let shapeNode = shapeItem.SvgElement.firstChild as SVGSVGElement;
-                        shapeNode.removeAttribute('style');
-                        let intersections = SvgUtility.FindIntersection(shapeItem as SvgElementShapeItem, path);
+                    }
+                    let shapeItem = shapes[i] as SvgElementShapeItem;
+                    //FindIntersection 会改变shapePath本身
+                    let shapePath = shapeItem.GetFirstShapeElement() as SVGSVGElement;
+                    shapePath.removeAttribute('style');
+                    if (shapeItem == this.activedShape) {
+                        let intersections = SvgUtility.FindIntersection(shapePath, path);
                         if (intersections && intersections.length == 2) {//连自身
-                            let shapeNode = shapeItem.SvgElement.firstChild as SVGSVGElement;
+                            let shapeNode = shapeItem.GetFirstShapeElement() as SVGSVGElement;
                             shapeNode.style.stroke = 'red';
                             this.targetShape = shapeItem as SvgElementShapeItem;
                             break;
                         }
                     } else {
-                        let intersections = SvgUtility.FindIntersection(shapeItem as SvgElementShapeItem, path);
+                        let intersections = SvgUtility.FindIntersection(shapePath, path);
+                        let shapeNode = shapeItem.GetFirstShapeElement() as SVGSVGElement;
                         if (intersections && intersections.length == 1) {
-                            let shapeNode = shapeItem.SvgElement.firstChild as SVGSVGElement;
                             shapeNode.style.stroke = 'red';
                             this.targetShape = shapeItem as SvgElementShapeItem;
                             break;
                         } else {
-                            let shapeNode = shapeItem.SvgElement.firstChild as SVGSVGElement;
                             shapeNode.removeAttribute('style');
                         }
                     }
@@ -404,7 +404,7 @@ export class SvgCanvas {
         let line = this.GetSvgElementById(lineId) as SvgElementLineItem;
         if (targetShape) {
             line.Target = targetShape;
-            let shapeNode = targetShape.SvgElement.firstChild as SVGSVGElement;
+            let shapeNode = targetShape.GetFirstShapeElement() as SVGSVGElement;
             shapeNode.removeAttribute('style');
             if (line.Target != line.Source) {
                 line.UpdateLinePath();
@@ -426,14 +426,14 @@ export class SvgCanvas {
         }
     }
 
-	// 通过Id批量移除元素
+    // 通过Id批量移除元素
     public RemoveElementsByIds(elementIds: string[]) {
         for (let i = 0; i < elementIds.length; i++) {
             this.RemoveElementById(elementIds[i]);
         }
         this.onElementDeleted();
     }
-	// 批量移除元素
+    // 批量移除元素
     public RemoveElements(delElements) {
         for (let i = 0; i < delElements.length; i++) {
             let delElement = delElements[i];
@@ -630,7 +630,7 @@ export class SvgCanvas {
             if (allElements[i].ElementType == 'shape') {
                 let shapeElement = allElements[i] as SvgElementShapeItem;
                 let translate = shapeElement.Translate;
-                let bbox = shapeElement.SvgElement.getBBox();
+                let bbox = shapeElement.GetShapeBBox();
 
                 if (translate[0] + bbox.x > min_x && translate[1] + bbox.y > min_y) {
                     let shapeMaxX = translate[0] + bbox.x + bbox.width;
@@ -649,7 +649,7 @@ export class SvgCanvas {
 
     // 构造选中框
     public CreateSelectRect(shape: SvgElementShapeItem) {
-        let bbox = shape.SvgElement.getBBox();
+        let bbox = shape.GetShapeBBox();
         let width = bbox.width + 4;
         let height = bbox.height + 4;
         let translate = shape.Translate;
@@ -761,10 +761,10 @@ export class SvgCanvas {
                 this.groupElement.appendChild(this.lineEndOperateSvg);
 
             } else {
+                let shapeElement = element as SvgElementShapeItem;
                 let svgElement = element.SvgElement;
                 let transfrom = svgElement.getAttribute('transform');
-                let firstChild = svgElement.firstChild as SVGSVGElement;
-                let bbox = firstChild.getBBox();
+                let bbox = shapeElement.GetShapeBBox();
 
                 this.elementOperateSvg.setAttribute('transform', transfrom +
                     ' translate(' + (bbox.width + bbox.x + 1) + ',' + (bbox.height / 2 + bbox.y - 5) + ')');
@@ -796,8 +796,7 @@ export class SvgCanvas {
     // 显示线蒙层
     private ShowLineMaskSvg() {
         let centerPoint = SvgUtility.GetElementCenterPoint(this.Activedshape);
-        let firstChild = this.Activedshape.SvgElement.firstChild as SVGSVGElement;
-        let bbox = firstChild.getBBox();
+        let bbox = this.Activedshape.GetShapeBBox();
         this.lineMaskOperateSvg.setAttribute('cx', centerPoint[0].toString());
         this.lineMaskOperateSvg.setAttribute('cy', centerPoint[1].toString());
         this.lineMaskOperateSvg.setAttribute('r', (bbox.width + 50).toString());

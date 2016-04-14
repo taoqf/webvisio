@@ -1,9 +1,11 @@
-﻿<!DOCTYPE html>
+
+<!DOCTYPE html>
 
 <html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <title>业务架构</title>
+	<meta charset="utf-8" />
+	<title>业务架构</title>
 
 	<link rel="stylesheet" type="text/css" href="../css/drawing-basic.css">
 	<link rel="stylesheet" href="../css/victop.css">
@@ -11,144 +13,179 @@
 	<script type="text/javascript" src='../js-src/dojo/dojo.js'></script>
 	<script type="text/javascript">
 		var drawObj;
+
 		function submitWPF(type, content) {
 			var param = {};
 			param.MessageType = type;
 			param.MessageContent = content;
 			// CCharpExtension.SendMessage(JSON.stringify(param));
 		}
+
 		function excuteFormWPF(data) {
 			return drawObj.handleWpfMessage(data);
 		}
 
-		require(['feidao/victopDrawing','dojo/domReady'],function(
+		require(['feidao/victopDrawing', 'dojo/domReady'], function(
 			victopDrawing,
 			domReady
-		){
+		) {
 			//业务架构 shape define
 			var shapeDefine = {
-					'framework.business.uint': {
-						elements: [{
-							svgType: 'path',
-							attrs: {
-								fill:'#6495ED',
-								d:'M0 0 H80 V50 H0 Z'
-							}
-						}],
-						text:{
-							   attrs: {
-								   x:0,
-								   y:0,
-								   dx:10,
-								   dy:30
-						   		}
-					   		},
-						height:'50',
-						width:'80'
-				   },
-				   'framework.business.uint_copy': {
-					   elements: [{
-						   svgType: 'path',
-						   attrs: {
-							   fill:'#FFA500',
-							   d:'M0 0 H80 V50 H0 Z'
-						   }
-					   }],
-					   text:{
-							  attrs: {
-								  x:0,
-								  y:0,
-								  dx:10,
-								  dy:30
-							   }
-						   },
-					   height:'50',
-					   width:'80'
-				  },
-				  'framework.business.uint_combine': {
-					  elements: [{
-						  svgType: 'path',
-						  attrs: {
-							  fill:'#8FBC8F',
-							  d:'M0 30 L40 0 L80 30 L40 60 Z'
-						  }
-					  }],
-					  text:{
-							 attrs: {
-								 x:0,
-								 y:0,
-								 dx:5,
-								 dy:35
-							  }
-						  },
-					  height:'60',
-					  width:'80'
-				 },
-				 'framework.business.business': {
-					 elements: [{
-						 svgType: 'circle',
-						 attrs: {
-							 fill:'white',
-							 stroke:'#D85EAB',
-							 'stroke-width':"2",
-							 r:'38',
-							 cx:'40',
-							 cy:'40'
-						 }
-					 }],
-					 text:{
-							attrs: {
-								x:0,
-								y:0,
-								dx:10,
-								dy:45
-							 }
-						 },
-				 	 height:'80',
-				 	width:'80'
+				'framework.business.uint': {
+					elements: [{
+						svgType: 'path',
+						attrs: {
+							fill: '#6495ED',
+							d: 'M0 0 H80 V50 H0 Z'
+						}
+					}],
+					text: {
+						attrs: {
+							x: 0,
+							y: 0,
+							dx: 10,
+							dy: 30
+						}
+					},
+					height: '50',
+					width: '80'
 				},
+				'framework.business.uint_copy': {
+					elements: [{
+						svgType: 'path',
+						attrs: {
+							fill: '#FFA500',
+							d: 'M0 0 H80 V50 H0 Z'
+						}
+					}],
+					text: {
+						attrs: {
+							x: 0,
+							y: 0,
+							dx: 10,
+							dy: 30
+						}
+					},
+					height: '50',
+					width: '80'
+				},
+				'framework.business.uint_combine': {
+					elements: [{
+						svgType: 'path',
+						attrs: {
+							fill: '#8FBC8F',
+							d: 'M0 30 L40 0 L80 30 L40 60 Z'
+						}
+					}],
+					text: {
+						attrs: {
+							x: 0,
+							y: 0,
+							dx: 5,
+							dy: 35
+						}
+					},
+					height: '60',
+					width: '80'
+				},
+				'framework.business.business': {
+					elements: [{
+						svgType: 'circle',
+						attrs: {
+							fill: 'white',
+							stroke: '#D85EAB',
+							'stroke-width': "2",
+							r: '38',
+							cx: '40',
+							cy: '40'
+						}
+					}],
+					text: {
+						attrs: {
+							x: 0,
+							y: 0,
+							dx: 10,
+							dy: 45
+						}
+					},
+					height: '80',
+					width: '80'
+				},
+				'container': {
+					elements: [{
+						svgType: 'rect',
+						attrs: {
+							fill: 'white',
+							stroke: 'black',
+							'stroke-dasharray':'2,6',
+							x: 2,
+							y: 2,
+							rx: 10,
+							ry: 10,
+							width: 90,
+							height: 60
+						}
+					}],
+					text: {
+						attrs: {
+							x: 0,
+							y: 0,
+							dx: 40,
+							dy: 10
+						}
+					},
+					height: '65',
+					width: '95'
+				}
 			};
 			var lines = [{
-					name:'link1',
-					defaultText:'连接线',
-					businessType:'a',
-					class:'solidLine'
-				}];
-			domReady(function(){
+				name: 'link1',
+				defaultText: '连接线',
+				businessType: 'a',
+				class: 'solidLine'
+			}];
+			domReady(function() {
 				var params = {
-					width:1200,
-					height:1000,
-					shapeDefine:shapeDefine,
-					lineModels:lines,
+					width: 1200,
+					height: 1000,
+					shapeDefine: shapeDefine,
+					lineModels: lines,
 					// runInWpf:true,
-					models:[{
-						id:'businessUint',
-						model:'framework.business.uint',
-						type:'businessUint',
-						links:['link1'],
-						defaultText:'业务主体',
-						mouseMenu:'delete'
-					},{
-						id:'businessUintCopy',
-						model:'framework.business.uint_copy',
-						type:'businessUintCopy',
-						links:['link1'],
-						defaultText:'业务主体副本',
-						mouseMenu:'copy'
-					},{
-						id:'businessCombine',
-						model:'framework.business.uint_combine',
-						type:'businessCombine',
-						links:['link1'],
-						defaultText:'业务主体组合',
-						mouseMenu:'delete,copy'
-					},{
-						id:'business',
-						model:'framework.business.business',
-						type:'business',
-						links:['link1'],
-						defaultText:'业务',
-						mouseMenu:'delete,copy'
+					models: [{
+						id: 'businessUint',
+						model: 'framework.business.uint',
+						type: 'businessUint',
+						links: ['link1'],
+						defaultText: '业务主体',
+						mouseMenu: 'delete'
+					}, {
+						id: 'businessUintCopy',
+						model: 'framework.business.uint_copy',
+						type: 'businessUintCopy',
+						links: ['link1'],
+						defaultText: '业务主体副本',
+						mouseMenu: 'copy'
+					}, {
+						id: 'businessCombine',
+						model: 'framework.business.uint_combine',
+						type: 'businessCombine',
+						links: ['link1'],
+						defaultText: '业务主体组合',
+						mouseMenu: 'delete,copy'
+					}, {
+						id: 'business',
+						model: 'framework.business.business',
+						type: 'business',
+						links: ['link1'],
+						defaultText: '业务',
+						mouseMenu: 'delete,copy'
+					}, {
+						id: 'container',
+						model: 'container',
+						type: 'container',
+						modelType:'container',
+						defaultText: '容器',
+						showText: true
 					}]
 				}
 				victopDrawing.initCanvas(params);
@@ -158,21 +195,21 @@
 				var btnImport = document.getElementById('btnImportData');
 				var btnImportTemplate = document.getElementById('btnImportTemplate');
 
-				var exportData,templateData;
-				btnExport.onclick = function (e) {
+				var exportData, templateData;
+				btnExport.onclick = function(e) {
 					exportData = templateData = victopDrawing.exportPageData();
 					console.log(exportData);
 				}
 
-				btnExportImg.onclick = function (e) {
+				btnExportImg.onclick = function(e) {
 					victopDrawing.exportImgData();
 				}
 
-				btnImport.onclick = function (e) {
+				btnImport.onclick = function(e) {
 					victopDrawing.importPageData(exportData);
 				}
 
-				btnImportTemplate.onclick = function (e) {
+				btnImportTemplate.onclick = function(e) {
 					victopDrawing.importTemplateData(templateData);
 				}
 
@@ -181,29 +218,35 @@
 
 				var sourceId, targetId;
 
-				btnCreateShape.onclick = function (e) {
-					positionX+=100;
+				btnCreateShape.onclick = function(e) {
+					positionX += 100;
 					var shapeData = {
-						canvasId:victopDrawing.activedPageSvg.Id,
-						businessType:'businessUint',
-						businessData:[['aaaaa'],['bbbb']],
-						positionX:positionX,
-						positionY:positionY
+						canvasId: victopDrawing.activedPageSvg.Id,
+						businessType: 'businessUint',
+						businessData: [
+							['aaaaa'],
+							['bbbb']
+						],
+						positionX: positionX,
+						positionY: positionY
 					};
 					var id = victopDrawing.createShapeElement(shapeData);
-					if(positionX%200 != 0){
+					if (positionX % 200 != 0) {
 						sourceId = id;
-					}else{
+					} else {
 						targetId = id;
 					}
 				}
-				btnConnectShape.onclick = function (e) {
+				btnConnectShape.onclick = function(e) {
 					var data = {
-						canvasId:victopDrawing.activedPageSvg.Id,
-						businessType:'a',
-						businessData:[['aaaaa'],['bbbb']],
-						sourceId:sourceId,
-						targetId:targetId
+						canvasId: victopDrawing.activedPageSvg.Id,
+						businessType: 'a',
+						businessData: [
+							['aaaaa'],
+							['bbbb']
+						],
+						sourceId: sourceId,
+						targetId: targetId
 					};
 					victopDrawing.createLineElement(data);
 				}
@@ -211,9 +254,10 @@
 		});
 	</script>
 </head>
+
 <body>
 	<!--模具组合-->
-    <div class="stencil-container" style="width:135px;">
+	<div class="stencil-container" style="width:135px;">
 		<div id="stencilContainer" class="modelContainer">
 			<button id="btnExportData">导出数据</button>
 			<button id="btnExportImg">导出Img</button>
@@ -222,7 +266,7 @@
 			<button id="btnCreateShape">生成图形</button>
 			<button id="btnConnectShape">连接图形</button>
 		</div>
-    </div>
+	</div>
 	<!--画布预定义-->
 	<svg id="svgDefs" xmlns="http://www.w3.org/2000/svg" width="0" height='0'>
 		<defs>
@@ -233,12 +277,12 @@
 	</svg>
 	<!--画布缩进-->
 	<div class="splitter-container" style="left:135px;">
-		<div class="splitter" id="splitterBtn" fold ='false'>
+		<div class="splitter" id="splitterBtn" fold='false'>
 			<i class="vicons">&#xe738;</i>
 		</div>
 	</div>
 	<!--画布-->
-    <div class="paper-container" id="svgContainer" style="left:152px; padding-left: 5px; padding-top: 5px;">
+	<div class="paper-container" id="svgContainer" style="left:152px; padding-left: 5px; padding-top: 5px;">
 		<div class="paper-scroller" id="svgScroller">
 			<div class="paper" id="svgPaper" style="margin-bottom: 4px; margin-right: 210px;">
 			</div>

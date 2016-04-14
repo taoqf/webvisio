@@ -1,6 +1,7 @@
 import {SvgElementBase} from './SvgElement';
 import {SvgElementShapeItem} from './SvgElement';
 import {SvgElementLineItem} from './SvgElement';
+import {SvgElementContainerItem} from './SvgElement';
 import SvgUtility from './SvgUtility'
 
 export interface ISelectable {
@@ -102,7 +103,6 @@ export class SvgCanvas {
 
     private targetShape: SvgElementShapeItem;
 
-    private elementMoving: boolean = false;
     private elementClicked: boolean = false;
 
     // private handlerPanel: Element;
@@ -222,93 +222,106 @@ export class SvgCanvas {
     }
 
     OnMousemove(evt: MouseEvent) {
-        let svgCanvasRect = this.svgCanvasElement.getBoundingClientRect();
-        if (this.activedShape && this.elementMoving) {
-            let bbox = this.activedShape.GetShapeBBox();
-            let x: number = (evt.clientX - svgCanvasRect.left - this.activedShape.Offset.H || 0 - bbox.x) / this.canvasScale;
-            let y: number = (evt.clientY - svgCanvasRect.top - this.activedShape.Offset.V || 0 - bbox.y) / this.canvasScale;
+		if (this.selectedElement&& this.selectedElement.IsDrag){
+			let svgCanvasRect = this.svgCanvasElement.getBoundingClientRect();
+			if (this.selectedElement.ElementType == 'shape') {
+				let bbox = this.activedShape.GetShapeBBox();
+				let x: number = (evt.clientX - svgCanvasRect.left - this.activedShape.Offset.H || 0 - bbox.x) / this.canvasScale;
+				let y: number = (evt.clientY - svgCanvasRect.top - this.activedShape.Offset.V || 0 - bbox.y) / this.canvasScale;
 
-            this.activedShape.SetTanslate(x, y);
-            this.PaperFitToContent(this.activedShape);
-            // 更新所有的选中的图形、线和选中框
-            this.UpdateSelectRect(this.activedShape);
-            this.MoveLines(this.activedShape);
-            if (this.selectService.GetSelectableCollection().length > 1) {
-                this.updateSelectedElements(this.activedShape);
-            }
-        }
+				this.activedShape.SetTanslate(x, y);
+				this.PaperFitToContent(this.activedShape);
+				// 更新所有的选中的图形、线和选中框
+				this.UpdateSelectRect(this.activedShape);
+				this.MoveLines(this.activedShape);
+				if (this.selectService.GetSelectableCollection().length > 1) {
+					this.updateSelectedElements(this.activedShape);
+				}
+			}
 
-        if (this.ActivedLine && this.ActivedLine.IsDrag) {
-            let cx: number = (evt.clientX - svgCanvasRect.left) / this.canvasScale;
-            let cy: number = (evt.clientY - svgCanvasRect.top) / this.canvasScale;
+			if (this.selectedElement.ElementType == 'line'){
+				let cx: number = (evt.clientX - svgCanvasRect.left) / this.canvasScale;
+				let cy: number = (evt.clientY - svgCanvasRect.top) / this.canvasScale;
 
-            // update line operate points
-            if (this.ActivedLine.DragType == 'middle') {
-                this.lineMidOperateSvg.setAttribute('cx', cx.toString());
-                this.lineMidOperateSvg.setAttribute('cy', cy.toString());
-                this.lineEndOperateSvg.setAttribute('cx', this.ActivedLine.OperatePoints[1][0].toString());
-                this.lineEndOperateSvg.setAttribute('cy', this.ActivedLine.OperatePoints[1][1].toString());
-                this.ActivedLine.UpdateOperatePoints([cx, cy], null);
-            } else {
-                this.lineEndOperateSvg.setAttribute('cx', cx.toString());
-                this.lineEndOperateSvg.setAttribute('cy', cy.toString());
-                this.lineMidOperateSvg.setAttribute('cx', this.ActivedLine.OperatePoints[0][0].toString());
-                this.lineMidOperateSvg.setAttribute('cy', this.ActivedLine.OperatePoints[0][1].toString());
-                if (this.ActivedLine.Target == null || this.ActivedLine.Target == this.ActivedLine.Source) {
-                    this.ActivedLine.UpdateOperatePoints(null, [cx, cy]);
-                } else if (Math.abs(this.ActivedLine.OperatePoints[1][0] - cx) > 10 ||
-                    Math.abs(this.ActivedLine.OperatePoints[1][1] - cy) > 10) {
-                    console.log('断开连接.......');
-                    // this.ActivedLine.RemoveTarget();
-                    this.onBeforeBreakConnetion(this.ActivedLine);
-                    this.ActivedLine.UpdateOperatePoints(null, [cx, cy]);
-                }
-            }
-            this.ActivedLine.UpdateLinePath();
+				// update line operate points
+				if (this.ActivedLine.DragType == 'middle') {
+					this.lineMidOperateSvg.setAttribute('cx', cx.toString());
+					this.lineMidOperateSvg.setAttribute('cy', cy.toString());
+					this.lineEndOperateSvg.setAttribute('cx', this.ActivedLine.OperatePoints[1][0].toString());
+					this.lineEndOperateSvg.setAttribute('cy', this.ActivedLine.OperatePoints[1][1].toString());
+					this.ActivedLine.UpdateOperatePoints([cx, cy], null);
+				} else {
+					this.lineEndOperateSvg.setAttribute('cx', cx.toString());
+					this.lineEndOperateSvg.setAttribute('cy', cy.toString());
+					this.lineMidOperateSvg.setAttribute('cx', this.ActivedLine.OperatePoints[0][0].toString());
+					this.lineMidOperateSvg.setAttribute('cy', this.ActivedLine.OperatePoints[0][1].toString());
+					if (this.ActivedLine.Target == null || this.ActivedLine.Target == this.ActivedLine.Source) {
+						this.ActivedLine.UpdateOperatePoints(null, [cx, cy]);
+					} else if (Math.abs(this.ActivedLine.OperatePoints[1][0] - cx) > 10 ||
+					Math.abs(this.ActivedLine.OperatePoints[1][1] - cy) > 10) {
+						console.log('断开连接.......');
+						// this.ActivedLine.RemoveTarget();
+						this.onBeforeBreakConnetion(this.ActivedLine);
+						this.ActivedLine.UpdateOperatePoints(null, [cx, cy]);
+					}
+				}
+				this.ActivedLine.UpdateLinePath();
 
-            this.groupElement.appendChild(this.lineMidOperateSvg);
-            this.groupElement.appendChild(this.lineEndOperateSvg);
-            this.PaperFitToContent(this.ActivedLine);
+				this.groupElement.appendChild(this.lineMidOperateSvg);
+				this.groupElement.appendChild(this.lineEndOperateSvg);
+				this.PaperFitToContent(this.ActivedLine);
 
-            //高亮目标shape element
-            if (this.ActivedLine.Target == null && this.ActivedLine.DragType == 'end') {
-                let centerPoint = SvgUtility.GetElementCenterPoint(this.activedShape);
-                let operatePoints = this.ActivedLine.OperatePoints;
-                let path = SvgUtility.BuildBezierPath(centerPoint, operatePoints[0], operatePoints[1], this.canvasScale);
+				//高亮目标shape element
+				if (this.ActivedLine.Target == null && this.ActivedLine.DragType == 'end') {
+					let centerPoint = SvgUtility.GetElementCenterPoint(this.activedShape);
+					let operatePoints = this.ActivedLine.OperatePoints;
+					let path = SvgUtility.BuildBezierPath(centerPoint, operatePoints[0], operatePoints[1], this.canvasScale);
 
-                let shapes = this.GetSvgElementsInCanvas();
-                this.targetShape = null;
-                for (let i = 0; i < shapes.length; i++) {
-                    if (shapes[i].ElementType != 'shape') {
-                        continue;
-                    }
-                    let shapeItem = shapes[i] as SvgElementShapeItem;
-                    //FindIntersection 会改变shapePath本身
-                    let shapePath = shapeItem.GetFirstShapeElement() as SVGSVGElement;
-                    shapePath.removeAttribute('style');
-                    if (shapeItem == this.activedShape) {
-                        let intersections = SvgUtility.FindIntersection(shapePath, path);
-                        if (intersections && intersections.length == 2) {//连自身
-                            let shapeNode = shapeItem.GetFirstShapeElement() as SVGSVGElement;
-                            shapeNode.style.stroke = 'red';
-                            this.targetShape = shapeItem as SvgElementShapeItem;
-                            break;
-                        }
-                    } else {
-                        let intersections = SvgUtility.FindIntersection(shapePath, path);
-                        let shapeNode = shapeItem.GetFirstShapeElement() as SVGSVGElement;
-                        if (intersections && intersections.length == 1) {
-                            shapeNode.style.stroke = 'red';
-                            this.targetShape = shapeItem as SvgElementShapeItem;
-                            break;
-                        } else {
-                            shapeNode.removeAttribute('style');
-                        }
-                    }
-                }
-            }
+					let shapes = this.GetSvgElementsInCanvas();
+					this.targetShape = null;
+					for (let i = 0; i < shapes.length; i++) {
+						if (shapes[i].ElementType != 'shape') {
+							continue;
+						}
+						let shapeItem = shapes[i] as SvgElementShapeItem;
+						//FindIntersection 会改变shapePath本身
+						let shapePath = shapeItem.GetFirstShapeElement() as SVGSVGElement;
+						shapePath.removeAttribute('style');
+						if (shapeItem == this.activedShape) {
+							let intersections = SvgUtility.FindIntersection(shapePath, path);
+							if (intersections && intersections.length == 2) {//连自身
+								let shapeNode = shapeItem.GetFirstShapeElement() as SVGSVGElement;
+								shapeNode.style.stroke = 'red';
+								this.targetShape = shapeItem as SvgElementShapeItem;
+								break;
+							}
+						} else {
+							let intersections = SvgUtility.FindIntersection(shapePath, path);
+							let shapeNode = shapeItem.GetFirstShapeElement() as SVGSVGElement;
+							if (intersections && intersections.length == 1) {
+								shapeNode.style.stroke = 'red';
+								this.targetShape = shapeItem as SvgElementShapeItem;
+								break;
+							} else {
+								shapeNode.removeAttribute('style');
+							}
+						}
+					}
+				}
 
-        }
+			}
+
+			if (this.selectedElement && this.selectedElement.ElementType == 'container'
+			&& this.selectedElement.IsDrag) {
+				var activedContainer = this.selectedElement as SvgElementContainerItem;
+				// // let bbox = this.activedShape.GetShapeBBox();
+				let x: number = (evt.clientX - svgCanvasRect.left - activedContainer.Offset.H || 0 ) / this.canvasScale;
+				let y: number = (evt.clientY - svgCanvasRect.top - activedContainer.Offset.V || 0) / this.canvasScale;
+				//
+				activedContainer.SetTanslate(x, y);
+			}
+		}
+
     }
 
     OnMouseup(evt: MouseEvent) {
@@ -934,9 +947,6 @@ export class SvgCanvas {
     set LineModels(models) {
         this.lineModels = models;
     }
-    set ElementMoving(moving: boolean) {
-        this.elementMoving = moving;
-    }
 
     set ElementClicked(selected: boolean) {
         this.elementClicked = selected;
@@ -944,7 +954,7 @@ export class SvgCanvas {
 
     set SelectedElement(element) {
         this.selectedElement = element;
-        if (element) {
+        if (element && element.ElementType != 'container') {
             this.onElementSelected(element);
         }
     }

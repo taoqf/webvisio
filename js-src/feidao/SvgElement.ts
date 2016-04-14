@@ -4,18 +4,19 @@ import {ISelectable} from './SvgCanvas';
 import SvgUtility from './SvgUtility'
 
 let notifyAddedEvent;
+
 export function registerElementAddedEvent(eventFn) {
     notifyAddedEvent = eventFn;
 };
+
 export class SvgElementBase implements ISelectable {
+    protected isDrag: boolean;
     protected id: String;
     protected title: String
     protected text: String;
     protected elementType: String;
     protected businessType: String;
     protected businessData: Object;
-    protected width: Number;
-    protected height: Number;
     protected xmlElement: String;
     //当前结点的根节点
     protected svgElement: SVGSVGElement;
@@ -57,23 +58,6 @@ export class SvgElementBase implements ISelectable {
     //设置 Text
     set Text(text: String) {
         this.text = text;
-    }
-
-    //获取 Width
-    get Width(): Number {
-        return this.width;
-    }
-    //设置 Width
-    set Width(width: Number) {
-        this.width = width;
-    }
-    //获取 Height
-    get Height(): Number {
-        return this.Height;
-    }
-    //设置 Height
-    set Height(height: Number) {
-        this.height = height;
     }
 
     get SvgCanvas() {
@@ -119,9 +103,17 @@ export class SvgElementBase implements ISelectable {
     get IsSelected() {
         return this.isSelected;
     }
+
+	get IsDrag() {
+		return this.isDrag;
+	}
+
+	set IsDrag(isDrag) {
+		this.isDrag = isDrag;
+	}
 }
+
 export class SvgElementShapeItem extends SvgElementBase {
-    private isDrag: boolean;
     private HorizontalOffset: number;
     private VerticalOffset: number;
     private translate: number[];
@@ -203,7 +195,7 @@ export class SvgElementShapeItem extends SvgElementBase {
     public OnDrag(evt: MouseEvent): void {
         if (this.isDrag) {
             this.svgCanvas.ResetHandlerPanel();
-            this.svgCanvas.ElementMoving = true;
+			this.svgElement.setAttribute('opacity','0.8');
         }
     }
     // mouseup 事件
@@ -215,9 +207,9 @@ export class SvgElementShapeItem extends SvgElementBase {
         if (this.svgCanvas.Activedshape && !evt.ctrlKey) {
             this.svgCanvas.ResetHandlerPanel(this);
         }
-        this.svgCanvas.ElementMoving = false;
         this.svgCanvas.ElementClicked = false;
         this.GetElementLines();
+		this.svgElement.removeAttribute('opacity');
     }
 
     // 获取与该图形相关的线
@@ -285,10 +277,6 @@ export class SvgElementShapeItem extends SvgElementBase {
         return { H: this.HorizontalOffset, V: this.VerticalOffset };
     }
 
-    get IsDrag() {
-        return this.isDrag;
-    }
-
     get ClonedId() {
         return this.clonedId;
     }
@@ -342,7 +330,6 @@ export class SvgElementShapeItem extends SvgElementBase {
 }
 
 export class SvgElementLineItem extends SvgElementBase {
-    private isDrag: boolean;
     private source: SvgElementShapeItem;
     private target: SvgElementShapeItem;
     private operatePoints: number[][];
@@ -794,14 +781,6 @@ export class SvgElementLineItem extends SvgElementBase {
         this.dragType = position;
     }
 
-    get IsDrag() {
-        return this.isDrag;
-    }
-
-    set IsDrag(isDrag) {
-        this.isDrag = isDrag;
-    }
-
     get Target() {
         return this.target;
     }
@@ -825,12 +804,35 @@ export class SvgElementLineItem extends SvgElementBase {
 }
 
 export class SvgElementContainerItem extends SvgElementBase {
-    constructor(svgElement: SVGSVGElement, svgCanvas: SvgCanvas, id?: string) {
+	private translate: number[];
+	private HorizontalOffset: number;
+    private VerticalOffset: number;
+    private width: number;
+    private height: number;
+
+	private titleRectSvg:SVGSVGElement;
+    constructor(width, height, svgCanvas: SvgCanvas, id?: string) {
         // 构造容器 svgElement
+		let gAttrs = { class: 'container'};
+		let rectAttrs = { fill:'none',stroke:'#03A9F4', x: 0, y: 0, width: width, height: height };
+		let titleRectAttrs = { fill:'#D4E2FF',stroke:'#808080', x: 0, y: 0, width: width,
+				height: 30,cursor:'move',opacity:'0.5' };
+		let textAttrs = {'text-anchor':'middle',x:0,y:20};
+        let gElement = SvgUtility.CreateSvgElement('g', gAttrs, svgCanvas.groupElement);
+		let scalableGroup = SvgUtility.CreateSvgElement('g', { class: 'scalable'}, gElement);
+		let rectElement = SvgUtility.CreateSvgElement('rect', rectAttrs, scalableGroup);
+		let titleRectElement = SvgUtility.CreateSvgElement('rect', titleRectAttrs, gElement);
+		let textElement = SvgUtility.CreateSvgElement('text', textAttrs, gElement) as HTMLElement;
+		textElement.setAttribute('transform','translate('+width/2+',0)');
+		textElement.innerHTML = '容器';
 
+		let svgElement = gElement as SVGSVGElement;
 
+		this.width = width;
+		this.height = height;
 
         super(svgElement, svgCanvas, id);
+		this.titleRectSvg = titleRectElement as SVGSVGElement;
         this.elementType = 'container';
 
         let text = '';
@@ -843,8 +845,67 @@ export class SvgElementContainerItem extends SvgElementBase {
 
     // 注册事件
     public RegisterEvent() {
-        // this.svgElement.onmousedown = (evt: MouseEvent) => { this.OnMouseDown(evt); };
-        // this.svgElement.onmousemove = (evt: MouseEvent) => { this.OnDrag(evt); };
-        // this.svgElement.onmouseup = (evt: MouseEvent) => { this.EndDrag(evt); };
+        this.titleRectSvg.onmousedown = (evt: MouseEvent) => { this.OnMouseDown(evt); };
+        this.titleRectSvg.onmousemove = (evt: MouseEvent) => { this.OnDrag(evt); };
+        this.titleRectSvg.onmouseup = (evt: MouseEvent) => { this.EndDrag(evt); };
+    }
+
+	// mousedown 事件
+    public OnMouseDown(evt: MouseEvent): void {
+		console.log('mouse down');
+        this.svgCanvas.ResetHandlerPanel();
+		this.svgCanvas.SelectedElement = this;
+        this.svgCanvas.ElementClicked = true;
+		this.isDrag = true;
+
+        let svgElementRect = this.svgElement.getBoundingClientRect();
+        this.HorizontalOffset = evt.clientX - svgElementRect.left;
+        this.VerticalOffset = evt.clientY - svgElementRect.top;
+
+		// 取消页面选中的元素
+	    this.svgCanvas.ClearSelectRect();
+        this.svgCanvas.SelectService.ClearCollection();
+    }
+    // mousemove 事件
+    public OnDrag(evt: MouseEvent): void {
+		console.log('mouse move');
+        if (this.isDrag) {
+
+        }
+    }
+    // mouseup 事件
+    public EndDrag(evt: MouseEvent): void {
+		console.log('mouse up');
+        this.isDrag = false;
+        this.svgCanvas.ElementClicked = false;
+    }
+
+	// 设置translate
+    public SetTanslate(x: number, y: number) {
+        x = Number(x.toFixed(2));
+        y = Number(y.toFixed(2));
+        super.SetTanslate(x, y);
+        this.translate = [x, y];
+    }
+
+	get Offset() {
+        return { H: this.HorizontalOffset, V: this.VerticalOffset };
+    }
+
+    //获取 Width
+    get Width(): number {
+        return this.width;
+    }
+    //设置 Width
+    set Width(width: number) {
+        this.width = width;
+    }
+    //获取 Height
+    get Height(): number {
+        return this.Height;
+    }
+    //设置 Height
+    set Height(height: number) {
+        this.height = height;
     }
 }

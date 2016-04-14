@@ -1,6 +1,8 @@
 ﻿import {SvgCanvas} from './SvgCanvas';
 import SvgUtility from './SvgUtility'
 import {SvgElementShapeItem} from './SvgElement';
+import {SvgElementContainerItem} from './SvgElement';
+
 
 let notifyAddedEvent;
 export function registerElementCreateEvent(eventFn) {
@@ -17,12 +19,12 @@ export class SvgElementModel {
     private defaultText;
     private showText: boolean = false;
     public static canvasScale = 1;
+	private modelType = 'shape';
 
     //构造函数
-    constructor(svgCanvaselement: HTMLElement, links) {
+    constructor(svgCanvaselement: HTMLElement) {
         this.svgCanvaselement = svgCanvaselement;
         this.svgCanvaselementRootNode = svgCanvaselement.parentNode as HTMLElement;
-        this.links = links;
         //添加事件
         this.svgCanvaselement.onmousedown = (evt: MouseEvent) => { this.StartDrag(evt); };
     }
@@ -52,6 +54,10 @@ export class SvgElementModel {
         return this.businessType;
     }
 
+	set Links(links){
+		this.links = links;
+	}
+
     get Links() {
         return this.links;
     }
@@ -72,6 +78,14 @@ export class SvgElementModel {
         return this.showText;
     }
 
+	set ModelType(type){
+		this.modelType = type;
+	}
+
+	get ModelType(){
+		return this.modelType;
+	}
+
     private StartDrag(evt: MouseEvent) {
 
         if (this.svgElementModelAdorner == null)
@@ -80,6 +94,7 @@ export class SvgElementModel {
     public getSvgContentElement(): Node {
         return this.getSvgElementByClassName("Content") as Node;
     }
+
     private getSvgElementByClassName(className: string): HTMLElement {
         if (this.svgCanvaselement.childNodes.length == 0)
             return null;
@@ -152,15 +167,20 @@ export class SvgElementModelAdorner {
                 if (evt.clientX > canvasRect.left && evt.clientX < canvasRect.right && evt.clientY > canvasRect.top && evt.clientY < canvasRect.bottom) {
                     let viewPointElement = this.svgElementModel.getSvgContentElement();
                     if (viewPointElement != null) {
-                        let shapeItem: SvgElementShapeItem = new SvgElementShapeItem(viewPointElement.cloneNode(true) as SVGSVGElement, SvgCanvas.CurrentCanvas);
-                        let x: number = (evt.clientX - canvasRect.left - this.width * SvgElementModel.canvasScale / 2) / SvgElementModel.canvasScale;
-                        let y: number = (evt.clientY - canvasRect.top - this.height * SvgElementModel.canvasScale / 2) / SvgElementModel.canvasScale;
-                        shapeItem.SetTanslate(x, y);
-                        shapeItem.Links = this.svgElementModel.Links;
-                        shapeItem.BusinessType = this.svgElementModel.BusinessType;
-                        shapeItem.SetText(this.svgElementModel.DefaultText, !this.svgElementModel.ShowText);
-                        SvgCanvas.CurrentCanvas.PaperFitToContent(shapeItem);
-                        notifyAddedEvent(SvgCanvas.CurrentCanvas, shapeItem);
+						let x: number = (evt.clientX - canvasRect.left - this.width * SvgElementModel.canvasScale / 2) / SvgElementModel.canvasScale;
+						let y: number = (evt.clientY - canvasRect.top - this.height * SvgElementModel.canvasScale / 2) / SvgElementModel.canvasScale;
+						if (this.svgElementModel.ModelType == 'shape'){
+							let shapeItem: SvgElementShapeItem = new SvgElementShapeItem(viewPointElement.cloneNode(true) as SVGSVGElement, SvgCanvas.CurrentCanvas);
+							shapeItem.SetTanslate(x, y);
+							shapeItem.Links = this.svgElementModel.Links;
+							shapeItem.BusinessType = this.svgElementModel.BusinessType;
+							shapeItem.SetText(this.svgElementModel.DefaultText, !this.svgElementModel.ShowText);
+							SvgCanvas.CurrentCanvas.PaperFitToContent(shapeItem);
+							notifyAddedEvent(SvgCanvas.CurrentCanvas, shapeItem);
+						} else if (this.svgElementModel.ModelType == 'container'){
+							let containerItem: SvgElementContainerItem = new SvgElementContainerItem(200,300,SvgCanvas.CurrentCanvas);
+							containerItem.SetTanslate(x, y);
+						}
                     }
                 }
             }

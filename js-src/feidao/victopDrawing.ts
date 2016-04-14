@@ -16,7 +16,6 @@ let pageidx = 1;
 let activedPageDom;
 export let activedPageSvg;
 let shapeDefine;
-let elementSelected = false;
 let runInWpf = false;
 let deletePageFn;
 
@@ -48,14 +47,14 @@ function initStencilArea(models) {
         let svgAttrs = [{ attr: 'id', val: models[i]['id'] }, { attr: 'width', val: shapeInfo['width'] },
             { attr: 'height', val: shapeInfo['height'] }, { attr: 'style', val: 'margin:auto;' }, { attr: 'display', val: 'block' }];
         let svgNode = SvgUtility.CreateSvgElement('svg', svgAttrs, stencilContainer);
-        let globalNode = SvgUtility.CreateSvgElement('g', gAttrs, svgNode);
+        let nodeGroup = SvgUtility.CreateSvgElement('g', gAttrs, svgNode);
         // shape global
-        let globalShape = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'shape' }], globalNode);
+        let scalableGroup = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'scalable' }], nodeGroup);
         for (let j = 0, count = shapes.length; j < count; j++) {
             let item = shapes[j];
-            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], globalShape);
+            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], scalableGroup);
         }
-        let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], globalNode) as HTMLElement;
+        let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], nodeGroup) as HTMLElement;
         stencilContainer.appendChild(svgNode);
         let txtDiv = document.createElement('div');
         txtDiv.setAttribute('class', 'stencil-text');
@@ -129,7 +128,7 @@ function registerPageEvent() {
         mousetop = e.offsetY;
         clientX = e.clientX;
         clientY = e.clientY;
-        if (isDragging && !elementSelected) {
+        if (isDragging && !activedPageSvg.SelectedElement) {
             let xMoved = e.clientX - beforeClientX || 0;
             let yMoved = e.clientY - beforeClientY || 0;
             scroller.scrollTop -= yMoved;
@@ -490,12 +489,12 @@ function importCanvasByData(data, isTemplate?) {
             continue
         }
         let gElement = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'content' }]);
-        var globalShape = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'shape' }], gElement);
+        var scalableGroup = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'scalable' }], gElement);
 
         let elements = shapeInfo['elements'];
         for (let j = 0, count = elements.length; j < count; j++) {
             let item = elements[j];
-            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], globalShape);
+            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], scalableGroup);
         }
         let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], gElement) as HTMLElement;
         let shapeItem = new SvgElementShapeItem(gElement as SVGSVGElement, svgCanvas, shape['id']);
@@ -590,13 +589,20 @@ function createCanvasPage(el) {
     let models = params.models;
     if (models) {
         for (let i = 0; i < models.length; i++) {
-            let element = document.getElementById(models[i]['id']);
-            let links = models[i]['links'];
-            let elementLinks = matchLinks(links, baseLines);
-            let model = new SvgElementModel(element, elementLinks);
-            model.BusinessType = models[i]['type'];
-            model.DefaultText = models[i]['defaultText'];
-            model.ShowText = models[i]['showText'];
+			var modelItem = models[i];
+            let element = document.getElementById(modelItem['id']);
+			let model = new SvgElementModel(element);
+			if (modelItem['modelType'] && modelItem['modelType'] == 'container'){
+				model.ModelType = 'container';
+			} else {
+				let links = modelItem['links'];
+				let elementLinks = matchLinks(links, baseLines);
+				model.Links = elementLinks;
+			}
+
+            model.BusinessType = modelItem['type'];
+            model.DefaultText = modelItem['defaultText'];
+            model.ShowText = modelItem['showText'];
         }
     }
     canvasCollection.push({ 'pageNo': pageidx, 'canvas': svgCanvas });
@@ -1047,19 +1053,19 @@ function changeElement(data) {
         let shapeInfo = shapeDefine[targetInfo['model']];
         let shapes = shapeInfo['elements'];
         let gAttrs = [{ attr: 'class', val: 'Content' }, { attr: 'transform', val: transform }];
-        let globalNode = SvgUtility.CreateSvgElement('g', gAttrs, canvas.groupElement);
-        let globalShape = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'shape' }], globalNode);
+        let nodeGroup = SvgUtility.CreateSvgElement('g', gAttrs, canvas.groupElement);
+        let scalableGroup = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'scalable' }], nodeGroup);
         for (let j = 0, count = shapes.length; j < count; j++) {
             let item = shapes[j];
-            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], globalShape);
+            SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], scalableGroup);
         }
-        let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], globalNode) as HTMLElement;
+        let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], nodeGroup) as HTMLElement;
         if (targetInfo['showText']) {
             textNode.innerHTML = targetInfo['defaultText'] || '';
         } else {
             textNode.setAttribute('display', 'none');
         }
-        selectedElement.SvgElement = globalNode as SVGSVGElement;
+        selectedElement.SvgElement = nodeGroup as SVGSVGElement;
         selectedElement.BusinessType = targetType;
         selectedElement.RegisterEvent();
     } else {
@@ -1142,7 +1148,6 @@ function selectElement(data) {
         canvas.ClearSelectRect();
         canvas.ActivedLine = element;
     }
-    elementSelected = true;
     canvas.ResetHandlerPanel(element);
 }
 
@@ -1155,7 +1160,7 @@ export function createShapeElement(data) {
     let canvas = getCanvasById(canvasId);
 
     let gElement = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'content' }]);
-    let globalShape = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'shape' }], gElement);
+    let scalableGroup = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'scalable' }], gElement);
     let shapeInfo = matchShapeInfo(businessType);
     if (!shapeInfo) {
         return;
@@ -1165,7 +1170,7 @@ export function createShapeElement(data) {
     let elements = shapeInfo['elements'];
     for (let j = 0, count = elements.length; j < count; j++) {
         let item = elements[j];
-        SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], globalShape);
+        SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], scalableGroup);
     }
     let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], gElement) as HTMLElement;
     let shapeItem = new SvgElementShapeItem(gElement as SVGSVGElement, canvas);
@@ -1352,7 +1357,6 @@ function elementConnectedEvent(canvas, line, targetShape) {
 // 增加后事件
 function elementAddedEvent(canvas, element) {
     if (!runInWpf) {
-        elementSelected = true;
         // 设置画布上的选中
         canvas.SelectedElement = element;
         if (element.ElementType == 'shape') {
@@ -1384,7 +1388,6 @@ function elementAddedEvent(canvas, element) {
 
 // 选中后事件
 function elementSelectedEvent(canvas, element) {
-    elementSelected = true;
     if (!runInWpf) {
         return;
     }
@@ -1451,7 +1454,6 @@ function elementDeletedEvent(canvas) {
 
 // 取消选中事件
 function cancelSelectEvent() {
-    elementSelected = false;
     if (!runInWpf) {
         return;
     }

@@ -23,17 +23,17 @@ export default class SvgUtility {
     }
 
     // 得到指定shape的中心点
-    public static GetElementCenterPoint(element: SvgElementShapeItem) {
-		let ctm = element.SvgElement.getCTM();
-		let shapeRect = element.SvgElement.getBoundingClientRect();
+    public static GetElementCenterPoint(element: SvgElementShapeItem, scale) {
+        let ctm = element.SvgElement.getCTM();
+        let shapeRect = element.SvgElement.getBoundingClientRect();
 
-		// start position
-		let offsetX = ctm.e;
+        // start position
+        let offsetX = ctm.e;
         let offsetY = ctm.f;
-		let width = shapeRect.width;
-		let height = shapeRect.height;
-		let cx = offsetX + width/2;
-		let cy = offsetY + height/2;
+        let width = shapeRect.width;
+        let height = shapeRect.height;
+        let cx = (offsetX + width / 2) / scale;
+        let cy = (offsetY + height / 2) / scale;
 
         return [cx, cy];
     }
@@ -235,9 +235,9 @@ export default class SvgUtility {
 
         this.lineStyleCache.push({
             'class': className, 'style': {
-            fill: fill, stroke: stroke,
-            'stroke-width': strokeWidth, 'stroke-dasharray': strokeDash, 'marker-end': marker
-        }
+                fill: fill, stroke: stroke,
+                'stroke-width': strokeWidth, 'stroke-dasharray': strokeDash, 'marker-end': marker
+            }
         });
     }
 

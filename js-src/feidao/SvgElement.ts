@@ -121,6 +121,7 @@ export class SvgElementShapeItem extends SvgElementBase {
     private clonedId: string = '';
     private relativeOffsetX: number;//相对偏移
     private relativeOffsetY: number;
+	private scale:number[] = [1,1];
     constructor(svgElement: SVGSVGElement, svgCanvas: SvgCanvas, id?: string) {
         super(svgElement, svgCanvas, id);
         this.elementType = 'shape';
@@ -262,10 +263,21 @@ export class SvgElementShapeItem extends SvgElementBase {
 	public SetScale(scale){
 		let scalableGroup = this.GetShapeGroup();
 		scalableGroup.setAttribute('transform','scale('+scale+')');
+		let scaleArray = scale.spit(',');
+		let scaleX = scaleArray[0];
+		let scaleY = scaleX;
+		if (scaleArray.length == 2){
+			scaleY = scaleArray[1];
+		}
+		this.scale = [scaleX, scaleY];
 		if (this.svgCanvas.SelectedElement == this){
 			this.svgCanvas.ReomveSelectRect(this);
 			this.svgCanvas.CreateSelectRect(this);
 		}
+	}
+
+	get Scale(){
+		return this.scale;
 	}
 
     set Links(links: Object[]) {
@@ -377,13 +389,13 @@ export class SvgElementLineItem extends SvgElementBase {
             return;
         }
         let canvasScale = this.svgCanvas.CanvasScale;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
         let startPoint = centerPoint;
         let middlePoint = this.operatePoints[0];
         let endPoint = this.operatePoints[1];
         if (this.target) {
             // 算比例和高度的时候，需要用两个中心点算
-            endPoint = SvgUtility.GetElementCenterPoint(this.target);
+            endPoint = SvgUtility.GetElementCenterPoint(this.target,canvasScale);
         }
 
         if (initByData || this.dragType == 'middle') {
@@ -438,7 +450,8 @@ export class SvgElementLineItem extends SvgElementBase {
         let x1, x2, y1, y2;
         let bbox = this.source.GetShapeBBox();
         let elementWidth = bbox.width;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
+		let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
         x1 = centerPoint[0] - elementWidth / 2;
         x2 = centerPoint[0] + elementWidth / 2;
         y1 = centerPoint[1] - elementWidth;
@@ -469,7 +482,8 @@ export class SvgElementLineItem extends SvgElementBase {
 
     // 更新self line
     private UpdateSelfLine() {
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
+		let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
         let path = 'M ' + centerPoint[0] + ',' + centerPoint[1] + 'C' + this.operatePoints[0][0] + ',' + this.operatePoints[0][1] + ' ' + this.operatePoints[1][0] + ',' + this.operatePoints[1][1] + ' ' + centerPoint[0] + ',' + centerPoint[1];
         let startIntersection = SvgUtility.FindIntersection(this.source.GetFirstShapeElement(), path);
         if (startIntersection && startIntersection.length == 2) {
@@ -505,8 +519,8 @@ export class SvgElementLineItem extends SvgElementBase {
             return;
         }
         let canvasScale = this.svgCanvas.CanvasScale;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
-        let targetCenterPoint = SvgUtility.GetElementCenterPoint(this.target);
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
+        let targetCenterPoint = SvgUtility.GetElementCenterPoint(this.target,canvasScale);
 
         let startPoint, endPoint;
 
@@ -545,7 +559,8 @@ export class SvgElementLineItem extends SvgElementBase {
 
     // 设置操作点局中心的偏移量
     public SetOperateOffset() {
-        let centerPoints = SvgUtility.GetElementCenterPoint(this.source);
+		let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoints = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
         this.operateOffset = [
             [this.operatePoints[0][0] - centerPoints[0],
                 this.operatePoints[0][1] - centerPoints[1]],
@@ -582,7 +597,8 @@ export class SvgElementLineItem extends SvgElementBase {
         let gElement = this.svgElement;
         let bbox = this.source.GetShapeBBox();
         let elementWidth = bbox.width;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
+		let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
         let oddCount = links.length % 2 == 0;
         let tempAngle = 0;
         if (oddCount) {
@@ -591,7 +607,6 @@ export class SvgElementLineItem extends SvgElementBase {
 
         let tempLineLen = elementWidth + 20;
         let me = this;
-        let canvasScale = this.svgCanvas.CanvasScale;
 
         for (let i = 0; i < links.length; i++) {
             let k = 1;
@@ -653,8 +668,8 @@ export class SvgElementLineItem extends SvgElementBase {
         me.BusinessType = linkInfo.businessType || '';
         let bbox = this.source.GetShapeBBox();
         let elementWidth = bbox.width;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source);
-        let canvasScale = this.svgCanvas.CanvasScale;
+		let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
         let linePoints = 'M' + centerPoint[0] * canvasScale + ',' + centerPoint[1] * canvasScale +
             ' L' + endX * canvasScale + ',' + endY * canvasScale;
 

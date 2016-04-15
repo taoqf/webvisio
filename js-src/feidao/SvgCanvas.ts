@@ -71,7 +71,7 @@ export class SvgCanvas {
 
     private svgElementBaseCollection: SvgElementBase[] = [];
 
-	private containerCollection: Object[] = [];
+    private containerCollection: Object[] = [];
 
     private selectService: SelectService = null;
 
@@ -217,8 +217,8 @@ export class SvgCanvas {
                     this.updateSelectedElements(activedShape);
                 }
 
-				// 添加到容器中
-				// this.CanAddInContainer(activedShape);
+                // 添加到容器中
+                // this.CanAddInContainer(activedShape);
             } else if (this.selectedElement.ElementType == 'line') {
                 let cx: number = (evt.clientX - svgCanvasRect.left) / this.canvasScale;
                 let cy: number = (evt.clientY - svgCanvasRect.top) / this.canvasScale;
@@ -254,7 +254,7 @@ export class SvgCanvas {
 
                 //高亮目标shape element
                 if (activedLine.Target == null && activedLine.DragType == 'end') {
-                    let centerPoint = SvgUtility.GetElementCenterPoint(activedLine.Source);
+                    let centerPoint = SvgUtility.GetElementCenterPoint(activedLine.Source, this.canvasScale);
                     let operatePoints = activedLine.OperatePoints;
                     let path = SvgUtility.BuildBezierPath(centerPoint, operatePoints[0], operatePoints[1], this.canvasScale);
 
@@ -378,9 +378,9 @@ export class SvgCanvas {
         });
 
         this.lineEndOperateSvg.addEventListener("mouseup", function() {
-			let activedLine = me.GetActivedLine();
+            let activedLine = me.GetActivedLine();
             if (activedLine) {
-				activedLine.IsDrag = false;
+                activedLine.IsDrag = false;
                 me.elementClicked = false;
             }
         });
@@ -527,7 +527,7 @@ export class SvgCanvas {
     // 拖动shape时，重置该shape上单线的位置
     private ResetSingleLine(line: SvgElementLineItem) {
         let sourceElement = line.Source.SvgElement;
-        let sourceCenter = SvgUtility.GetElementCenterPoint(line.Source);
+        let sourceCenter = SvgUtility.GetElementCenterPoint(line.Source, this.canvasScale);
         let points = [[
             sourceCenter[0] + line.SourceOffset[0][0],
             sourceCenter[1] + line.SourceOffset[0][1]
@@ -652,11 +652,12 @@ export class SvgCanvas {
     // 构造选中框
     public CreateSelectRect(shape: SvgElementShapeItem) {
         let bbox = shape.GetShapeBBox();
-        let width = bbox.width + 4;
-        let height = bbox.height + 4;
+        let width = (bbox.width) / this.canvasScale + 4;
+        let height = (bbox.height) / this.canvasScale + 4;
         let translate = shape.Translate;
-        let offsetX = translate[0] + bbox.x - 2;
-        let offsetY = translate[1] + bbox.y - 2;
+        let scale = shape.Scale;
+        let offsetX = translate[0] + bbox.x * scale[0] - 2;
+        let offsetY = translate[1] + bbox.y * scale[1] - 2;
 
         let rectAttrs = { class: 'selection-box', dataId: shape.Id, x: offsetX, y: offsetY, width: width, height: height };
         let rectSvg = SvgUtility.CreateSvgElement('rect', rectAttrs, this.groupElement);
@@ -767,9 +768,12 @@ export class SvgCanvas {
                 let svgElement = element.SvgElement;
                 let transfrom = svgElement.getAttribute('transform');
                 let bbox = shapeElement.GetShapeBBox();
+                let scale = shapeElement.Scale;
+                let translateX = (bbox.width + bbox.x * scale[0]) / this.canvasScale + 2;
+                let translateY = (bbox.height / 2 + bbox.y * scale[1]) / this.canvasScale - 5;
 
                 this.elementOperateSvg.setAttribute('transform', transfrom +
-                    ' translate(' + (bbox.width + bbox.x + 1) + ',' + (bbox.height / 2 + bbox.y - 5) + ')');
+                    ' translate(' + translateX + ',' + translateY + ')');
                 this.elementOperateSvg.setAttribute('display', 'block');
                 this.groupElement.appendChild(this.elementOperateSvg);
             }
@@ -798,7 +802,7 @@ export class SvgCanvas {
 
     // 显示线蒙层
     private ShowLineMaskSvg(shapeItem: SvgElementShapeItem) {
-        let centerPoint = SvgUtility.GetElementCenterPoint(shapeItem);
+        let centerPoint = SvgUtility.GetElementCenterPoint(shapeItem, this.canvasScale);
         let bbox = shapeItem.GetShapeBBox();
         this.lineMaskOperateSvg.setAttribute('cx', centerPoint[0].toString());
         this.lineMaskOperateSvg.setAttribute('cy', centerPoint[1].toString());
@@ -934,29 +938,29 @@ export class SvgCanvas {
         return null;
     }
 
-	// 判断是否能加入到容器中，全部使用client Rect 判断
-	public CanAddInContainer(shape: SvgElementShapeItem){
-		let containers = this.containerCollection;
-		let count = containers.length;
-		if (count == 0){
-			return;
-		}
-		let shapeRect = shape.SvgElement.getBoundingClientRect();
-		let shapeX = shapeRect.left;
-		console.log('sssssss');
+    // 判断是否能加入到容器中，全部使用client Rect 判断
+    public CanAddInContainer(shape: SvgElementShapeItem) {
+        let containers = this.containerCollection;
+        let count = containers.length;
+        if (count == 0) {
+            return;
+        }
+        let shapeRect = shape.SvgElement.getBoundingClientRect();
+        let shapeX = shapeRect.left;
+        console.log('sssssss');
 
-		for (let i = 0; i < count; i++){
-			let container = containers[i]['container'];
-			let elements = containers[i]['elements'];
-			let containerRect = container.SvgElement.getBoundingClientRect();
-			container.ClearHighlightStyle();
-			if (shapeRect.left > containerRect.left  && shapeRect.right < containerRect.right &&
-				shapeRect.top > containerRect.top && shapeRect.bottom < containerRect.bottom
-			) {
-				container.AddHighlightStyle();
-			}
-		}
-	}
+        for (let i = 0; i < count; i++) {
+            let container = containers[i]['container'];
+            let elements = containers[i]['elements'];
+            let containerRect = container.SvgElement.getBoundingClientRect();
+            container.ClearHighlightStyle();
+            if (shapeRect.left > containerRect.left && shapeRect.right < containerRect.right &&
+                shapeRect.top > containerRect.top && shapeRect.bottom < containerRect.bottom
+                ) {
+                container.AddHighlightStyle();
+            }
+        }
+    }
 
     get TempLine() {
         return this.tempLine;
@@ -1053,12 +1057,12 @@ export class SvgCanvas {
         return this.svgElementBaseCollection;
     }
 
-	// 添加到容器集合
+    // 添加到容器集合
     public AddInContainerCollection(container: SvgElementContainerItem) {
-		var containerItem = {
-			container:container,
-			elements:[]
-		};
+        var containerItem = {
+            container: container,
+            elements: []
+        };
         this.containerCollection.push(containerItem);
     }
 

@@ -24,21 +24,17 @@ export default class SvgUtility {
 
     // 得到指定shape的中心点
     public static GetElementCenterPoint(element: SvgElementShapeItem) {
-        let translate = element.SvgElement.getAttribute('transform');
+		let ctm = element.SvgElement.getCTM();
+		let shapeRect = element.SvgElement.getBoundingClientRect();
 
-        let translateStr = translate.substring(translate.indexOf('(') + 1, translate.length - 1);
-        let splitOperator = ',';
-        if (translateStr.indexOf(splitOperator) == -1) {
-            splitOperator = ' ';
-        }
-        let points = translateStr.split(splitOperator);
-        let firstChild = element.SvgElement.firstChild as SVGSVGElement;
-        let BBox = firstChild.getBBox();
-        let cyOffset = BBox.height;
-        let cxOffset = BBox.width;
+		// start position
+		let offsetX = ctm.e;
+        let offsetY = ctm.f;
+		let width = shapeRect.width;
+		let height = shapeRect.height;
+		let cx = offsetX + width/2;
+		let cy = offsetY + height/2;
 
-        let cx = parseInt(points[0]) + cxOffset / 2 + BBox.x;
-        let cy = parseInt(points[1]) + cyOffset / 2 + BBox.y;
         return [cx, cy];
     }
 

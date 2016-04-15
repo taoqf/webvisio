@@ -514,16 +514,24 @@ function importCanvasByData(data, isTemplate?) {
 
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
+
         if (!SvgUtility.findItemInArray('businessType', line['type'], baseLines)) {
             continue;
         }
         // 去除重复元素
-        if (isTemplate && svgCanvas.GetSvgElementById(line['id'])) {
+        let lineElement = svgCanvas.GetSvgElementById(line['id']);
+		let sourceId = line['sourceId'];
+		let targetId = line['targetId'];
+		let opreatePoints = line['opreatePoints'];
+        if (isTemplate && lineElement) {
+			if(targetId){
+				let targetShape = svgCanvas.GetSvgElementById(targetId) as SvgElementShapeItem;
+				lineElement.Target = targetShape;
+				lineElement.UpdateOperatePoints(opreatePoints[0], opreatePoints[1]);
+				lineElement.UpdateLinePath(true);
+			}
             continue
         }
-        let sourceId = line['sourceId'];
-        let targetId = line['targetId'];
-        let opreatePoints = line['opreatePoints'];
         let sourceShape = svgCanvas.GetSvgElementById(sourceId) as SvgElementShapeItem;
         let lineItem = new SvgElementLineItem(svgCanvas, sourceShape, line['id']);
         if (targetId) {
@@ -584,7 +592,6 @@ function createCanvasPage(el) {
     let height: number = params.height;
 
     let svgCanvas = new SvgCanvas(canvasElement, width, height);
-    svgCanvas.LineModels = params.lineModels;
     baseLines = params.lineModels;
     let models = params.models;
     if (models) {
@@ -876,6 +883,11 @@ export function handleWpfMessage(message): string {
                 break;
             case 'createLineElement':
                 result = createLineElement(message['MessageContent']);
+				break;
+			// 设置图形缩放比例
+			case 'setShapeScale':
+                setShapeScale(message['MessageContent']);
+				break;
             default:
                 break;
         }
@@ -1226,6 +1238,18 @@ export function createLineElement(data) {
     };
 
     return JSON.stringify(result);
+}
+
+function setShapeScale(data){
+	let canvasId = data['canvasId'];
+	let nodeId = data['nodeId'];
+	let scale = data['scale'];
+	let canvas = getCanvasById(canvasId);
+	let element = canvas.GetSvgElementById(nodeId);
+	if (element && element.ElementType == 'shape'){
+		let shape = element as SvgElementShapeItem;
+		shape.SetScale(scale);
+	}
 }
 
 // handle wpf message end

@@ -71,6 +71,8 @@ export class SvgCanvas {
 
     private svgElementBaseCollection: SvgElementBase[] = [];
 
+	private containerCollection: Object[] = [];
+
     private selectService: SelectService = null;
 
     public static CurrentCanvas: SvgCanvas;
@@ -214,6 +216,9 @@ export class SvgCanvas {
                 if (this.selectService.GetSelectableCollection().length > 1) {
                     this.updateSelectedElements(activedShape);
                 }
+
+				// 添加到容器中
+				// this.CanAddInContainer(activedShape);
             } else if (this.selectedElement.ElementType == 'line') {
                 let cx: number = (evt.clientX - svgCanvasRect.left) / this.canvasScale;
                 let cy: number = (evt.clientY - svgCanvasRect.top) / this.canvasScale;
@@ -929,6 +934,30 @@ export class SvgCanvas {
         return null;
     }
 
+	// 判断是否能加入到容器中，全部使用client Rect 判断
+	public CanAddInContainer(shape: SvgElementShapeItem){
+		let containers = this.containerCollection;
+		let count = containers.length;
+		if (count == 0){
+			return;
+		}
+		let shapeRect = shape.SvgElement.getBoundingClientRect();
+		let shapeX = shapeRect.left;
+		console.log('sssssss');
+
+		for (let i = 0; i < count; i++){
+			let container = containers[i]['container'];
+			let elements = containers[i]['elements'];
+			let containerRect = container.SvgElement.getBoundingClientRect();
+			container.ClearHighlightStyle();
+			if (shapeRect.left > containerRect.left  && shapeRect.right < containerRect.right &&
+				shapeRect.top > containerRect.top && shapeRect.bottom < containerRect.bottom
+			) {
+				container.AddHighlightStyle();
+			}
+		}
+	}
+
     get TempLine() {
         return this.tempLine;
     }
@@ -1023,4 +1052,14 @@ export class SvgCanvas {
     public GetSvgElementsInCanvas() {
         return this.svgElementBaseCollection;
     }
+
+	// 添加到容器集合
+    public AddInContainerCollection(container: SvgElementContainerItem) {
+		var containerItem = {
+			container:container,
+			elements:[]
+		};
+        this.containerCollection.push(containerItem);
+    }
+
 }

@@ -258,6 +258,16 @@ export class SvgElementShapeItem extends SvgElementBase {
         return bbox;
     }
 
+	// 设置scale
+	public SetScale(scale){
+		let scalableGroup = this.GetShapeGroup();
+		scalableGroup.setAttribute('transform','scale('+scale+')');
+		if (this.svgCanvas.SelectedElement == this){
+			this.svgCanvas.ReomveSelectRect(this);
+			this.svgCanvas.CreateSelectRect(this);
+		}
+	}
+
     set Links(links: Object[]) {
         this.links = links;
     }
@@ -801,6 +811,7 @@ export class SvgElementContainerItem extends SvgElementBase {
     private height: number;
 
     private titleRectSvg: SVGSVGElement;
+	private containerRectSvg: SVGSVGElement;
     constructor(width, height, svgCanvas: SvgCanvas, id?: string) {
         // 构造容器 svgElement
         let gAttrs = { class: 'container' };
@@ -824,6 +835,7 @@ export class SvgElementContainerItem extends SvgElementBase {
         this.height = height;
 
         super(svgElement, svgCanvas, id);
+		this.containerRectSvg = rectElement as SVGSVGElement;
         this.titleRectSvg = titleRectElement as SVGSVGElement;
         this.elementType = 'container';
 
@@ -833,6 +845,7 @@ export class SvgElementContainerItem extends SvgElementBase {
         //元素加载事件
         this.RegisterEvent();
 
+		svgCanvas.AddInContainerCollection(this);
     }
 
     // 注册事件
@@ -879,6 +892,14 @@ export class SvgElementContainerItem extends SvgElementBase {
         super.SetTanslate(x, y);
         this.translate = [x, y];
     }
+
+	public AddHighlightStyle(){
+		this.containerRectSvg.setAttribute('style','stroke:red;');
+	}
+
+	public ClearHighlightStyle(){
+		this.containerRectSvg.removeAttribute('style');
+	}
 
     get Offset() {
         return { H: this.HorizontalOffset, V: this.VerticalOffset };

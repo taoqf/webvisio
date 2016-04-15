@@ -121,7 +121,8 @@ export class SvgElementShapeItem extends SvgElementBase {
     private clonedId: string = '';
     private relativeOffsetX: number;//相对偏移
     private relativeOffsetY: number;
-	private scale:number[] = [1,1];
+    private scale: number[] = [1, 1];
+	private textSvg:HTMLElement;
     constructor(svgElement: SVGSVGElement, svgCanvas: SvgCanvas, id?: string) {
         super(svgElement, svgCanvas, id);
         this.elementType = 'shape';
@@ -132,14 +133,14 @@ export class SvgElementShapeItem extends SvgElementBase {
             if (nodes[i].nodeName == 'text') {
                 let text_node = nodes[i] as HTMLElement;
                 text = text_node.innerHTML.trim();
+				this.textSvg = text_node;
                 break;
             }
         }
         this.svgElement.setAttribute('cursor', 'default');
-
+		this.centerText();
         //元素加载事件
         this.RegisterEvent();
-
     }
 
     // 注册事件
@@ -185,7 +186,6 @@ export class SvgElementShapeItem extends SvgElementBase {
         }
 
         this.svgCanvas.ResetHandlerPanel(this);
-
 
         this.svgCanvas.SelectedElement = this;
     }
@@ -259,26 +259,53 @@ export class SvgElementShapeItem extends SvgElementBase {
         return bbox;
     }
 
-	// 设置scale
-	public SetScale(scale){
-		let scalableGroup = this.GetShapeGroup();
-		scalableGroup.setAttribute('transform','scale('+scale+')');
-		let scaleArray = scale.spit(',');
-		let scaleX = scaleArray[0];
-		let scaleY = scaleX;
-		if (scaleArray.length == 2){
-			scaleY = scaleArray[1];
-		}
-		this.scale = [scaleX, scaleY];
-		if (this.svgCanvas.SelectedElement == this){
-			this.svgCanvas.ReomveSelectRect(this);
-			this.svgCanvas.CreateSelectRect(this);
+    // 设置scale
+    public SetScale(scale) {
+        let scalableGroup = this.GetShapeGroup();
+        scalableGroup.setAttribute('transform', 'scale(' + scale + ')');
+        let scaleArray = scale.split(',');
+        let scaleX = scaleArray[0];
+        let scaleY = scaleX;
+        if (scaleArray.length == 2) {
+            scaleY = scaleArray[1];
+        }
+        this.scale = [scaleX, scaleY];
+        if (this.svgCanvas.SelectedElement == this) {
+            this.svgCanvas.ReomveSelectRect(this);
+            this.svgCanvas.CreateSelectRect(this);
+        }
+		this.centerText();
+    }
+
+	// 设置text
+	public SetText(text: String, isHide?: boolean) {
+		if (isHide || text.trim().length == 0) {
+			this.textSvg.setAttribute('display', 'none');
+			this.text = '';
+			this.textSvg.innerHTML = '';
+		} else if (text.trim().length > 0) {
+			this.textSvg.removeAttribute('display');
+			this.text = text;
+			this.textSvg.innerHTML = text.toString();
 		}
 	}
 
-	get Scale(){
-		return this.scale;
+	// 设置图形颜色
+	public SetColor(color) {
+		let firstChild = this.GetFirstShapeElement();
+		firstChild.setAttribute('fill', color);
 	}
+
+	// 将text位置设置为图形中心
+	private centerText(){
+		let centerPoint = SvgUtility.GetElementCenterPoint(this,this.svgCanvas.CanvasScale);
+		let ctm = this.svgElement.getCTM();
+		this.textSvg.setAttribute('transform','translate('+(centerPoint[0] - ctm.e)+','+(centerPoint[1] - ctm.f)+')');
+	}
+
+    get Scale() {
+        return this.scale;
+    }
 
     set Links(links: Object[]) {
         this.links = links;
@@ -321,31 +348,6 @@ export class SvgElementShapeItem extends SvgElementBase {
         this.relativeOffsetY = y;
     }
 
-    // 设置text
-    public SetText(text: String, isHide?: boolean) {
-        let nodes = this.svgElement.childNodes;
-        for (let i = 0; i < nodes.length; i++) {
-            if (nodes[i].nodeName == 'text') {
-                let textNode = nodes[i] as HTMLElement;
-                if (isHide || text.trim().length == 0) {
-                    textNode.setAttribute('display', 'none');
-                    this.text = '';
-                    textNode.innerHTML = '';
-                } else if (text.trim().length > 0) {
-                    textNode.removeAttribute('display');
-                    this.text = text;
-                    textNode.innerHTML = text.toString();
-                }
-                break;
-            }
-        }
-    }
-
-    // 设置图形颜色
-    public SetColor(color) {
-        let firstChild = this.GetFirstShapeElement();
-        firstChild.setAttribute('fill', color);
-    }
 }
 
 export class SvgElementLineItem extends SvgElementBase {
@@ -389,13 +391,13 @@ export class SvgElementLineItem extends SvgElementBase {
             return;
         }
         let canvasScale = this.svgCanvas.CanvasScale;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source, canvasScale);
         let startPoint = centerPoint;
         let middlePoint = this.operatePoints[0];
         let endPoint = this.operatePoints[1];
         if (this.target) {
             // 算比例和高度的时候，需要用两个中心点算
-            endPoint = SvgUtility.GetElementCenterPoint(this.target,canvasScale);
+            endPoint = SvgUtility.GetElementCenterPoint(this.target, canvasScale);
         }
 
         if (initByData || this.dragType == 'middle') {
@@ -450,8 +452,8 @@ export class SvgElementLineItem extends SvgElementBase {
         let x1, x2, y1, y2;
         let bbox = this.source.GetShapeBBox();
         let elementWidth = bbox.width;
-		let canvasScale = this.svgCanvas.CanvasScale;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
+        let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source, canvasScale);
         x1 = centerPoint[0] - elementWidth / 2;
         x2 = centerPoint[0] + elementWidth / 2;
         y1 = centerPoint[1] - elementWidth;
@@ -482,8 +484,8 @@ export class SvgElementLineItem extends SvgElementBase {
 
     // 更新self line
     private UpdateSelfLine() {
-		let canvasScale = this.svgCanvas.CanvasScale;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
+        let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source, canvasScale);
         let path = 'M ' + centerPoint[0] + ',' + centerPoint[1] + 'C' + this.operatePoints[0][0] + ',' + this.operatePoints[0][1] + ' ' + this.operatePoints[1][0] + ',' + this.operatePoints[1][1] + ' ' + centerPoint[0] + ',' + centerPoint[1];
         let startIntersection = SvgUtility.FindIntersection(this.source.GetFirstShapeElement(), path);
         if (startIntersection && startIntersection.length == 2) {
@@ -519,8 +521,8 @@ export class SvgElementLineItem extends SvgElementBase {
             return;
         }
         let canvasScale = this.svgCanvas.CanvasScale;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
-        let targetCenterPoint = SvgUtility.GetElementCenterPoint(this.target,canvasScale);
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source, canvasScale);
+        let targetCenterPoint = SvgUtility.GetElementCenterPoint(this.target, canvasScale);
 
         let startPoint, endPoint;
 
@@ -559,8 +561,8 @@ export class SvgElementLineItem extends SvgElementBase {
 
     // 设置操作点局中心的偏移量
     public SetOperateOffset() {
-		let canvasScale = this.svgCanvas.CanvasScale;
-        let centerPoints = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
+        let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoints = SvgUtility.GetElementCenterPoint(this.source, canvasScale);
         this.operateOffset = [
             [this.operatePoints[0][0] - centerPoints[0],
                 this.operatePoints[0][1] - centerPoints[1]],
@@ -597,8 +599,8 @@ export class SvgElementLineItem extends SvgElementBase {
         let gElement = this.svgElement;
         let bbox = this.source.GetShapeBBox();
         let elementWidth = bbox.width;
-		let canvasScale = this.svgCanvas.CanvasScale;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
+        let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source, canvasScale);
         let oddCount = links.length % 2 == 0;
         let tempAngle = 0;
         if (oddCount) {
@@ -668,8 +670,8 @@ export class SvgElementLineItem extends SvgElementBase {
         me.BusinessType = linkInfo.businessType || '';
         let bbox = this.source.GetShapeBBox();
         let elementWidth = bbox.width;
-		let canvasScale = this.svgCanvas.CanvasScale;
-        let centerPoint = SvgUtility.GetElementCenterPoint(this.source,canvasScale);
+        let canvasScale = this.svgCanvas.CanvasScale;
+        let centerPoint = SvgUtility.GetElementCenterPoint(this.source, canvasScale);
         let linePoints = 'M' + centerPoint[0] * canvasScale + ',' + centerPoint[1] * canvasScale +
             ' L' + endX * canvasScale + ',' + endY * canvasScale;
 
@@ -826,7 +828,7 @@ export class SvgElementContainerItem extends SvgElementBase {
     private height: number;
 
     private titleRectSvg: SVGSVGElement;
-	private containerRectSvg: SVGSVGElement;
+    private containerRectSvg: SVGSVGElement;
     constructor(width, height, svgCanvas: SvgCanvas, id?: string) {
         // 构造容器 svgElement
         let gAttrs = { class: 'container' };
@@ -850,7 +852,7 @@ export class SvgElementContainerItem extends SvgElementBase {
         this.height = height;
 
         super(svgElement, svgCanvas, id);
-		this.containerRectSvg = rectElement as SVGSVGElement;
+        this.containerRectSvg = rectElement as SVGSVGElement;
         this.titleRectSvg = titleRectElement as SVGSVGElement;
         this.elementType = 'container';
 
@@ -860,7 +862,7 @@ export class SvgElementContainerItem extends SvgElementBase {
         //元素加载事件
         this.RegisterEvent();
 
-		svgCanvas.AddInContainerCollection(this);
+        svgCanvas.AddInContainerCollection(this);
     }
 
     // 注册事件
@@ -908,13 +910,13 @@ export class SvgElementContainerItem extends SvgElementBase {
         this.translate = [x, y];
     }
 
-	public AddHighlightStyle(){
-		this.containerRectSvg.setAttribute('style','stroke:red;');
-	}
+    public AddHighlightStyle() {
+        this.containerRectSvg.setAttribute('style', 'stroke:red;');
+    }
 
-	public ClearHighlightStyle(){
-		this.containerRectSvg.removeAttribute('style');
-	}
+    public ClearHighlightStyle() {
+        this.containerRectSvg.removeAttribute('style');
+    }
 
     get Offset() {
         return { H: this.HorizontalOffset, V: this.VerticalOffset };

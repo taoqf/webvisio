@@ -104,13 +104,13 @@ export class SvgElementBase implements ISelectable {
         return this.isSelected;
     }
 
-	get IsDrag() {
-		return this.isDrag;
-	}
+    get IsDrag() {
+        return this.isDrag;
+    }
 
-	set IsDrag(isDrag) {
-		this.isDrag = isDrag;
-	}
+    set IsDrag(isDrag) {
+        this.isDrag = isDrag;
+    }
 }
 
 export class SvgElementShapeItem extends SvgElementBase {
@@ -156,8 +156,8 @@ export class SvgElementShapeItem extends SvgElementBase {
         let svgElementRect = this.svgElement.getBoundingClientRect();
         this.HorizontalOffset = evt.clientX - svgElementRect.left;
         this.VerticalOffset = evt.clientY - svgElementRect.top;
-        if (this.svgCanvas.ActivedLine && !this.svgCanvas.ActivedLine.LineSvg) {
-            this.svgCanvas.ActivedLine.RemoveTempLines(true);
+        if (this.svgCanvas.TempLine && !this.svgCanvas.TempLine.LineSvg) {
+            this.svgCanvas.TempLine.RemoveTempLines(true);
         }
         this.svgCanvas.groupElement.appendChild(this.svgElement);
 
@@ -185,9 +185,6 @@ export class SvgElementShapeItem extends SvgElementBase {
 
         this.svgCanvas.ResetHandlerPanel(this);
 
-        if (this.svgCanvas.Activedshape != this) {
-            this.svgCanvas.Activedshape = this;
-        }
 
         this.svgCanvas.SelectedElement = this;
     }
@@ -195,7 +192,7 @@ export class SvgElementShapeItem extends SvgElementBase {
     public OnDrag(evt: MouseEvent): void {
         if (this.isDrag) {
             this.svgCanvas.ResetHandlerPanel();
-			this.svgElement.setAttribute('opacity','0.8');
+            this.svgElement.setAttribute('opacity', '0.8');
         }
     }
     // mouseup 事件
@@ -204,12 +201,12 @@ export class SvgElementShapeItem extends SvgElementBase {
         this.HorizontalOffset = 0;
         this.VerticalOffset = 0;
         this.svgElement.setAttribute('cursor', 'default');
-        if (this.svgCanvas.Activedshape && !evt.ctrlKey) {
+        if (this.svgCanvas.SelectedElement == this && !evt.ctrlKey) {
             this.svgCanvas.ResetHandlerPanel(this);
         }
         this.svgCanvas.ElementClicked = false;
         this.GetElementLines();
-		this.svgElement.removeAttribute('opacity');
+        this.svgElement.removeAttribute('opacity');
     }
 
     // 获取与该图形相关的线
@@ -353,10 +350,7 @@ export class SvgElementLineItem extends SvgElementBase {
 
         if (!id) {
             this.CreateTempLines();
-            if (this.svgCanvas.ActivedLine) {
-                this.svgCanvas.ActivedLine.HideTangentLines();
-            }
-            this.svgCanvas.ActivedLine = this;
+            this.svgCanvas.TempLine = this;
         }
     }
 
@@ -675,13 +669,10 @@ export class SvgElementLineItem extends SvgElementBase {
             me.svgCanvas.groupElement.appendChild(me.svgElement);
             me.svgCanvas.ResetHandlerPanel();
             me.svgCanvas.ResetHandlerPanel(me);
-            if (me.svgCanvas.ActivedLine) {
-                me.svgCanvas.ActivedLine.HideTangentLines();
-            }
-            me.svgCanvas.ActivedLine = me;
-            me.svgCanvas.Activedshape = me.source;
             me.svgCanvas.ElementClicked = true;
             me.svgCanvas.SelectedElement = me;
+            me.svgCanvas.SelectService.ClearCollection();
+            me.svgCanvas.ClearSelectRect();
             me.ShowTangentLines();
         });
         this.pathZone.addEventListener("mouseup", function() {
@@ -700,7 +691,6 @@ export class SvgElementLineItem extends SvgElementBase {
 
         this.svgCanvas.ResetHandlerPanel();
         this.svgCanvas.ResetHandlerPanel(this);
-        this.svgCanvas.ActivedLine = this;
         this.SetOperateOffset();
         this.OperateHeight = 0;
         this.OperateScale = 0.5;
@@ -718,7 +708,7 @@ export class SvgElementLineItem extends SvgElementBase {
         if (removeSelf) {
             this.svgCanvas.RemoveFromBaseCollection(this);
             this.svgCanvas.groupElement.removeChild(this.svgElement);
-            this.svgCanvas.ActivedLine = null;
+            this.svgCanvas.TempLine = null;
         }
         this.SvgCanvas.HideLineMaskSvg();
     }
@@ -804,35 +794,37 @@ export class SvgElementLineItem extends SvgElementBase {
 }
 
 export class SvgElementContainerItem extends SvgElementBase {
-	private translate: number[];
-	private HorizontalOffset: number;
+    private translate: number[];
+    private HorizontalOffset: number;
     private VerticalOffset: number;
     private width: number;
     private height: number;
 
-	private titleRectSvg:SVGSVGElement;
+    private titleRectSvg: SVGSVGElement;
     constructor(width, height, svgCanvas: SvgCanvas, id?: string) {
         // 构造容器 svgElement
-		let gAttrs = { class: 'container'};
-		let rectAttrs = { fill:'none',stroke:'#03A9F4', x: 0, y: 0, width: width, height: height };
-		let titleRectAttrs = { fill:'#D4E2FF',stroke:'#808080', x: 0, y: 0, width: width,
-				height: 30,cursor:'move',opacity:'0.5' };
-		let textAttrs = {'text-anchor':'middle',x:0,y:20};
+        let gAttrs = { class: 'container' };
+        let rectAttrs = { fill: 'none', stroke: '#03A9F4', x: 0, y: 0, width: width, height: height };
+        let titleRectAttrs = {
+            fill: '#D4E2FF', stroke: '#808080', x: 0, y: 0, width: width,
+            height: 30, cursor: 'move', opacity: '0.5'
+        };
+        let textAttrs = { 'text-anchor': 'middle', x: 0, y: 20 };
         let gElement = SvgUtility.CreateSvgElement('g', gAttrs, svgCanvas.groupElement);
-		let scalableGroup = SvgUtility.CreateSvgElement('g', { class: 'scalable'}, gElement);
-		let rectElement = SvgUtility.CreateSvgElement('rect', rectAttrs, scalableGroup);
-		let titleRectElement = SvgUtility.CreateSvgElement('rect', titleRectAttrs, gElement);
-		let textElement = SvgUtility.CreateSvgElement('text', textAttrs, gElement) as HTMLElement;
-		textElement.setAttribute('transform','translate('+width/2+',0)');
-		textElement.innerHTML = '容器';
+        let scalableGroup = SvgUtility.CreateSvgElement('g', { class: 'scalable' }, gElement);
+        let rectElement = SvgUtility.CreateSvgElement('rect', rectAttrs, scalableGroup);
+        let titleRectElement = SvgUtility.CreateSvgElement('rect', titleRectAttrs, gElement);
+        let textElement = SvgUtility.CreateSvgElement('text', textAttrs, gElement) as HTMLElement;
+        textElement.setAttribute('transform', 'translate(' + width / 2 + ',0)');
+        textElement.innerHTML = '容器';
 
-		let svgElement = gElement as SVGSVGElement;
+        let svgElement = gElement as SVGSVGElement;
 
-		this.width = width;
-		this.height = height;
+        this.width = width;
+        this.height = height;
 
         super(svgElement, svgCanvas, id);
-		this.titleRectSvg = titleRectElement as SVGSVGElement;
+        this.titleRectSvg = titleRectElement as SVGSVGElement;
         this.elementType = 'container';
 
         let text = '';
@@ -850,37 +842,37 @@ export class SvgElementContainerItem extends SvgElementBase {
         this.titleRectSvg.onmouseup = (evt: MouseEvent) => { this.EndDrag(evt); };
     }
 
-	// mousedown 事件
+    // mousedown 事件
     public OnMouseDown(evt: MouseEvent): void {
-		console.log('mouse down');
+        console.log('mouse down');
         this.svgCanvas.ResetHandlerPanel();
-		this.svgCanvas.SelectedElement = this;
+        this.svgCanvas.SelectedElement = this;
         this.svgCanvas.ElementClicked = true;
-		this.isDrag = true;
+        this.isDrag = true;
 
         let svgElementRect = this.svgElement.getBoundingClientRect();
         this.HorizontalOffset = evt.clientX - svgElementRect.left;
         this.VerticalOffset = evt.clientY - svgElementRect.top;
 
-		// 取消页面选中的元素
-	    this.svgCanvas.ClearSelectRect();
+        // 取消页面选中的元素
+        this.svgCanvas.ClearSelectRect();
         this.svgCanvas.SelectService.ClearCollection();
     }
     // mousemove 事件
     public OnDrag(evt: MouseEvent): void {
-		console.log('mouse move');
+        console.log('mouse move');
         if (this.isDrag) {
 
         }
     }
     // mouseup 事件
     public EndDrag(evt: MouseEvent): void {
-		console.log('mouse up');
+        console.log('mouse up');
         this.isDrag = false;
         this.svgCanvas.ElementClicked = false;
     }
 
-	// 设置translate
+    // 设置translate
     public SetTanslate(x: number, y: number) {
         x = Number(x.toFixed(2));
         y = Number(y.toFixed(2));
@@ -888,7 +880,7 @@ export class SvgElementContainerItem extends SvgElementBase {
         this.translate = [x, y];
     }
 
-	get Offset() {
+    get Offset() {
         return { H: this.HorizontalOffset, V: this.VerticalOffset };
     }
 

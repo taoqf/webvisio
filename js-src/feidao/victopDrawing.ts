@@ -62,9 +62,9 @@ function initStencilArea(models) {
         if (textInfos) {
             for (let i = 0, len = textInfos.length; i < len; i++) {
                 let info = textInfos[i];
-                let textNode = SvgUtility.CreateSvgElement('text', info['attrs']||[], nodeGroup) as HTMLElement;
+                let textNode = SvgUtility.CreateSvgElement('text', info['attrs'] || [], nodeGroup) as HTMLElement;
             }
-        } 
+        }
         stencilContainer.appendChild(svgNode);
         let txtDiv = document.createElement('div');
         txtDiv.setAttribute('class', 'stencil-text');
@@ -509,7 +509,14 @@ function importCanvasByData(data, isTemplate?) {
             let item = elements[j];
             SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], scalableGroup);
         }
-        let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], gElement) as HTMLElement;
+        // 构造text node
+        let textInfos = shapeInfo['texts'];
+        if (textInfos) {
+            for (let i = 0, len = textInfos.length; i < len; i++) {
+                let info = textInfos[i];
+                let textNode = SvgUtility.CreateSvgElement('text', info['attrs'] || [], gElement) as HTMLElement;
+            }
+        }
         let shapeItem = new SvgElementShapeItem(gElement as SVGSVGElement, svgCanvas, shape['id']);
         let shapeLinks = matchLinks(shapeInfo['links'], baseLines);
         shapeItem.Links = shapeLinks;
@@ -520,8 +527,12 @@ function importCanvasByData(data, isTemplate?) {
             shapeItem.SetColor(shape['shapeColor']);
         }
         let texts = shape['text'] || ''.split('|');
-        for (let k = 0; k < texts.length; k++) {
-            shapeItem.SetText(texts[k]);
+        if (typeof (texts) == 'object') {
+            for (let k = 0; k < texts.length; k++) {
+                shapeItem.SetText(texts[k]);
+            }
+        } else {
+            shapeItem.SetText(texts);
         }
         if (isTemplate) {
             svgCanvas.SelectService.AddSelected(shapeItem);

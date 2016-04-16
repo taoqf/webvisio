@@ -1,9 +1,11 @@
-﻿<!DOCTYPE html>
+
+<!DOCTYPE html>
 
 <html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <title>DFD2</title>
+	<meta charset="utf-8" />
+	<title>DFD2</title>
 
 	<link rel="stylesheet" type="text/css" href="../css/drawing-basic.css">
 	<link rel="stylesheet" href="../css/victop.css">
@@ -11,257 +13,259 @@
 	<script type="text/javascript" src='../js-src/dojo/dojo.js'></script>
 	<script type="text/javascript">
 		var drawObj;
+
 		function submitWPF(type, content) {
 			var param = {};
 			param.MessageType = type;
 			param.MessageContent = content;
 			CCharpExtension.SendMessage(JSON.stringify(param));
 		}
+
 		function excuteFormWPF(data) {
 			return drawObj.handleWpfMessage(data);
 		}
 
-		require(['feidao/victopDrawing','dojo/domReady'],function(
+		require(['feidao/victopDrawing', 'dojo/domReady'], function(
 			victopDrawing,
 			domReady
-		){
+		) {
 			//DFD2 shape define
 			var shapeDefine = {
-					'dfd2.user': {
-						elements: [{
-							svgType: 'path',
-							attrs: {
-								fill:'#9ACD32',
-								d:'M0 0 H70 V75 H0 Z'
-							}
-						},{
-							svgType: 'path',
-							attrs: {
-								stroke:'#fff',
-								'stroke-width':'2',
-								d:'M0 20 H70'
-							}
-						}],
-						text:{
-							   attrs: {
-								   x:0,
-								   y:0,
-								   dx:5,
-								   dy:50
-						   		}
-					   		},
-						height:'75',
-						width:'70'
-				   	},
-				    'dfd2.system_user': {
-					   elements: [{
-						   svgType: 'path',
-						   attrs: {
-							   fill:'#6495ED',
-							   d:'M0 0 H70 V75 H0 Z'
-						   }
-					   },{
-						   svgType: 'path',
-						   attrs: {
-							   stroke:'#fff',
-							   'stroke-width':'2',
-							   d:'M0 20 H70'
-						   }
-					   }],
-					   text:{
-							  attrs: {
-								  x:0,
-								  y:0,
-								  dx:5,
-								  dy:50
-							   }
-						   },
-					   height:'75',
-					   width:'70'
-				  	 },
-				  	'dfd2.page': {
-					  elements: [{
-						  svgType: 'path',
-						  attrs: {
-							  fill:'#6495ED',
-							  d:'M0 0 H80 V50 H0 Z'
-						  }
-					  }],
-					  text:{
-							 attrs: {
-								 x:0,
-								 y:0,
-								 dx:10,
-								 dy:30
-							  }
-						  },
-					  height:'50',
-					  width:'80'
-				  	},
-				  	'dfd2.service': {
- 					 elements: [{
- 						 svgType: 'circle',
- 						 attrs: {
- 							 fill:'#6495ED',
- 							 r:'38',
- 							 cx:'40',
- 							 cy:'40'
- 						 }
- 					 }],
- 					 text:{
- 							attrs: {
- 								x:0,
- 								y:0,
- 								dx:10,
- 								dy:45
- 							 }
- 						 },
-	 				 height:'80',
-	 				 width:'80'
-	 				},
-			   		'dfd2.third.page': {
-					   elements: [{
-						   svgType: 'path',
-						   attrs: {
-							   fill:'#9ACD32',
-							   d:'M0 0 H80 V50 H0 Z'
-						   }
-					   }],
-					   text:{
-							  attrs: {
-								  x:0,
-								  y:0,
-								  dx:10,
-								  dy:30
-							   }
-						   },
-					   height:'50',
-					   width:'80'
-				  	},
-			    	'dfd2.third.service': {
-	  				   elements: [{
-	  					   svgType: 'circle',
-	  					   attrs: {
-	  						   fill:'#6495ED',
-	  						   r:'38',
-	  						   cx:'40',
-	  						   cy:'40'
-	  					   }
-	  				   }],
-	  				   text:{
-	  						  attrs: {
-	  							  x:0,
-	  							  y:0,
-	  							  dx:10,
-	  							  dy:45
-	  						   }
-	  					   },
-		  			   height:'80',
-		  			   width:'80'
-		  			  },
-				  	'dfd2.stroage': {
-						 elements: [{
-							 svgType: 'path',
-							 attrs: {
-								 fill:'#fff',
-								 d:'M0 0 H80 V30 H0 Z'
-							 }
-						 },{
-							 svgType: 'path',
-							 attrs: {
-								 stroke:'#000',
-								 'stroke-width':'2',
-								 d:'M0 0 H80'
-							 }
-						 },{
-							 svgType: 'path',
-							 attrs: {
-								 stroke:'#000',
-								 'stroke-width':'2',
-								 d:'M0 30 H80'
-							 }
-						 }],
-						 text:{
-								attrs: {
-									x:0,
-									y:0,
-									dx:10,
-									dy:20
-								 }
-							 },
-						 height:'30',
-						 width:'80'
+				'dfd2.user': {
+					elements: [{
+						svgType: 'path',
+						attrs: {
+							fill: '#9ACD32',
+							d: 'M0 0 H70 V75 H0 Z'
 						}
+					}, {
+						svgType: 'path',
+						attrs: {
+							stroke: '#fff',
+							'stroke-width': '2',
+							d: 'M0 20 H70'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '75',
+					width: '70'
+				},
+				'dfd2.system_user': {
+					elements: [{
+						svgType: 'path',
+						attrs: {
+							fill: '#6495ED',
+							d: 'M0 0 H70 V75 H0 Z'
+						}
+					}, {
+						svgType: 'path',
+						attrs: {
+							stroke: '#fff',
+							'stroke-width': '2',
+							d: 'M0 20 H70'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '75',
+					width: '70'
+				},
+				'dfd2.page': {
+					elements: [{
+						svgType: 'path',
+						attrs: {
+							fill: '#6495ED',
+							d: 'M0 0 H80 V50 H0 Z'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '50',
+					width: '80'
+				},
+				'dfd2.service': {
+					elements: [{
+						svgType: 'circle',
+						attrs: {
+							fill: '#6495ED',
+							r: '38',
+							cx: '40',
+							cy: '40'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '80',
+					width: '80'
+				},
+				'dfd2.third.page': {
+					elements: [{
+						svgType: 'path',
+						attrs: {
+							fill: '#9ACD32',
+							d: 'M0 0 H80 V50 H0 Z'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '50',
+					width: '80'
+				},
+				'dfd2.third.service': {
+					elements: [{
+						svgType: 'circle',
+						attrs: {
+							fill: '#6495ED',
+							r: '38',
+							cx: '40',
+							cy: '40'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '80',
+					width: '80'
+				},
+				'dfd2.stroage': {
+					elements: [{
+						svgType: 'path',
+						attrs: {
+							fill: '#fff',
+							d: 'M0 0 H80 V30 H0 Z'
+						}
+					}, {
+						svgType: 'path',
+						attrs: {
+							stroke: '#000',
+							'stroke-width': '2',
+							d: 'M0 0 H80'
+						}
+					}, {
+						svgType: 'path',
+						attrs: {
+							stroke: '#000',
+							'stroke-width': '2',
+							d: 'M0 30 H80'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '30',
+					width: '80'
+				}
 			};
 			var lines = [{
-					name:'link1',
-					defaultText:'单向数据流',
-					businessType:'',
-					class:'solidLine-blue'
-				}];
-			domReady(function(){
+				name: 'link1',
+				defaultText: '单向数据流',
+				businessType: '',
+				class: 'solidLine-blue'
+			}];
+			domReady(function() {
 				var params = {
-					width:1200,
-					height:1000,
-					shapeDefine:shapeDefine,
-					lineModels:lines,
-					runInWpf:true,
-					models:[{
-						id:'user',
-						model:'dfd2.user',
-						type:'dfd2User',
-						links:['link1'],
-						defaultText:'用户',
-						showText:true,
-						mouseMenu:'delete,copy'
-					},{
-						id:'system_user',
-						model:'dfd2.system_user',
-						type:'daf2SywtemUser',
-						links:['link1'],
-						defaultText:'系统用户',
-						showText:true,
-						mouseMenu:'delete,copy'
-					},{
-						id:'page',
-						model:'dfd2.page',
-						type:'dfd2Page',
-						links:['link1'],
-						defaultText:'页面',
-						showText:true,
-						mouseMenu:'delete,copy'
-					},{
-						id:'service',
-						model:'dfd2.service',
-						type:'dfd2Serivce',
-						links:['link1'],
-						defaultText:'服务',
-						showText:true,
-						mouseMenu:'delete,copy'
-					},{
-						id:'thirdPage',
-						model:'dfd2.third.page',
-						type:'dfd2ThirdPage',
-						links:['link1'],
-						defaultText:'第三方页面',
-						showText:true,
-						mouseMenu:'delete,copy'
-					},{
-						id:'thirdService',
-						model:'dfd2.third.service',
-						type:'dfd2ThirdSerivce',
-						links:['link1'],
-						defaultText:'第三方服务',
-						showText:true,
-						mouseMenu:'delete,copy'
-					},{
-						id:'stroage',
-						model:'dfd2.stroage',
-						type:'dfd2Stroage',
-						links:['link1'],
-						defaultText:'存储',
-						showText:true,
-						mouseMenu:'delete,copy'
+					width: 1200,
+					height: 1000,
+					shapeDefine: shapeDefine,
+					lineModels: lines,
+					runInWpf: true,
+					models: [{
+						id: 'user',
+						model: 'dfd2.user',
+						type: 'dfd2User',
+						links: ['link1'],
+						defaultText: '用户',
+						showText: true,
+						mouseMenu: 'delete,copy'
+					}, {
+						id: 'system_user',
+						model: 'dfd2.system_user',
+						type: 'daf2SywtemUser',
+						links: ['link1'],
+						defaultText: '系统用户',
+						showText: true,
+						mouseMenu: 'delete,copy'
+					}, {
+						id: 'page',
+						model: 'dfd2.page',
+						type: 'dfd2Page',
+						links: ['link1'],
+						defaultText: '页面',
+						showText: true,
+						mouseMenu: 'delete,copy'
+					}, {
+						id: 'service',
+						model: 'dfd2.service',
+						type: 'dfd2Serivce',
+						links: ['link1'],
+						defaultText: '服务',
+						showText: true,
+						mouseMenu: 'delete,copy'
+					}, {
+						id: 'thirdPage',
+						model: 'dfd2.third.page',
+						type: 'dfd2ThirdPage',
+						links: ['link1'],
+						defaultText: '第三方页面',
+						showText: true,
+						mouseMenu: 'delete,copy'
+					}, {
+						id: 'thirdService',
+						model: 'dfd2.third.service',
+						type: 'dfd2ThirdSerivce',
+						links: ['link1'],
+						defaultText: '第三方服务',
+						showText: true,
+						mouseMenu: 'delete,copy'
+					}, {
+						id: 'stroage',
+						model: 'dfd2.stroage',
+						type: 'dfd2Stroage',
+						links: ['link1'],
+						defaultText: '存储',
+						showText: true,
+						mouseMenu: 'delete,copy'
 					}]
 				}
 				victopDrawing.initCanvas(params);
@@ -272,12 +276,13 @@
 		});
 	</script>
 </head>
+
 <body>
 	<!--模具组合-->
-    <div class="stencil-container" style="width:135px;">
+	<div class="stencil-container" style="width:135px;">
 		<div id="stencilContainer" class="modelContainer">
 		</div>
-    </div>
+	</div>
 	<!--画布预定义-->
 	<svg id="svgDefs" xmlns="http://www.w3.org/2000/svg" width="0" height='0'>
 		<defs>
@@ -291,7 +296,7 @@
 	</svg>
 	<!--画布缩进-->
 	<div class="splitter-container" style="left:135px;">
-		<div class="splitter" id="splitterBtn" fold ='false'>
+		<div class="splitter" id="splitterBtn" fold='false'>
 			<i class="vicons">&#xe738;</i>
 		</div>
 	</div>

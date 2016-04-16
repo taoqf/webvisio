@@ -40,12 +40,15 @@ function initStencilArea(models) {
         return false;
     }
 
-    let gAttrs = [{ attr: 'class', val: 'Content' }];
     for (let i = 0, len = models.length; i < len; i++) {
+        let gAttrs = [{ attr: 'class', val: 'Content' }];
         let shapeInfo = shapeDefine[models[i]['model']];
         let shapes = shapeInfo['elements'];
-        let svgAttrs = [{ attr: 'id', val: models[i]['id'] }, { attr: 'width', val: shapeInfo['width'] },
-            { attr: 'height', val: shapeInfo['height'] }, { attr: 'style', val: 'margin:auto;' }, { attr: 'display', val: 'block' }];
+        let svgAttrs = [{ attr: 'id', val: models[i]['id'] }, { attr: 'width', val: shapeInfo['width'] }, { attr: 'height', val: shapeInfo['height'] }, { attr: 'style', val: 'margin:auto;' }, { attr: 'display', val: 'block' }];
+        let scale = shapeInfo['scale'];
+        if (scale) {
+            gAttrs.push({ attr: 'transform', val: 'scale(' + scale + ')' });
+        }
         let svgNode = SvgUtility.CreateSvgElement('svg', svgAttrs, stencilContainer);
         let nodeGroup = SvgUtility.CreateSvgElement('g', gAttrs, svgNode);
         // shape global
@@ -54,7 +57,14 @@ function initStencilArea(models) {
             let item = shapes[j];
             SvgUtility.CreateSvgElement(item['svgType'], item['attrs'], scalableGroup);
         }
-        let textNode = SvgUtility.CreateSvgElement('text', shapeInfo['text']['attrs'], nodeGroup) as HTMLElement;
+        // 构造text node
+        let textInfos = shapeInfo['texts'];
+        if (textInfos) {
+            for (let i = 0, len = textInfos.length; i < len; i++) {
+                let info = textInfos[i];
+                let textNode = SvgUtility.CreateSvgElement('text', info['attrs']||[], nodeGroup) as HTMLElement;
+            }
+        } 
         stencilContainer.appendChild(svgNode);
         let txtDiv = document.createElement('div');
         txtDiv.setAttribute('class', 'stencil-text');
@@ -397,6 +407,9 @@ function getCanvasData(canvas) {
             let replaceStr = '"';
             shapeItem['text'] = shape.Text.replace(new RegExp(replaceStr, 'gm'), "'");
             shapeItem['businessData'] = shape.BusinessData;
+            if (shape.ShapeColor) {
+                shapeItem['shapeColor'] = shape.ShapeColor;
+            }
 
             shapes.push(shapeItem);
         } else {
@@ -501,9 +514,15 @@ function importCanvasByData(data, isTemplate?) {
         let shapeLinks = matchLinks(shapeInfo['links'], baseLines);
         shapeItem.Links = shapeLinks;
         shapeItem.SetTanslate(shape['translate'][0], shape['translate'][1]);
-        shapeItem.SetText(shape['text']);
         shapeItem.BusinessType = shape['type'];
         shapeItem.BusinessData = shape['businessData'];
+        if (shape['shapeColor']) {
+            shapeItem.SetColor(shape['shapeColor']);
+        }
+        let texts = shape['text'] || ''.split('|');
+        for (let k = 0; k < texts.length; k++) {
+            shapeItem.SetText(texts[k]);
+        }
         if (isTemplate) {
             svgCanvas.SelectService.AddSelected(shapeItem);
             svgCanvas.CreateSelectRect(shapeItem);
@@ -520,16 +539,16 @@ function importCanvasByData(data, isTemplate?) {
         }
         // 去除重复元素
         let lineElement = svgCanvas.GetSvgElementById(line['id']);
-		let sourceId = line['sourceId'];
-		let targetId = line['targetId'];
-		let opreatePoints = line['opreatePoints'];
+        let sourceId = line['sourceId'];
+        let targetId = line['targetId'];
+        let opreatePoints = line['opreatePoints'];
         if (isTemplate && lineElement) {
-			if(targetId){
-				let targetShape = svgCanvas.GetSvgElementById(targetId) as SvgElementShapeItem;
-				lineElement.Target = targetShape;
-				lineElement.UpdateOperatePoints(opreatePoints[0], opreatePoints[1]);
-				lineElement.UpdateLinePath(true);
-			}
+            if (targetId) {
+                let targetShape = svgCanvas.GetSvgElementById(targetId) as SvgElementShapeItem;
+                lineElement.Target = targetShape;
+                lineElement.UpdateOperatePoints(opreatePoints[0], opreatePoints[1]);
+                lineElement.UpdateLinePath(true);
+            }
             continue
         }
         let sourceShape = svgCanvas.GetSvgElementById(sourceId) as SvgElementShapeItem;
@@ -596,16 +615,16 @@ function createCanvasPage(el) {
     let models = params.models;
     if (models) {
         for (let i = 0; i < models.length; i++) {
-			var modelItem = models[i];
+            var modelItem = models[i];
             let element = document.getElementById(modelItem['id']);
-			let model = new SvgElementModel(element);
-			if (modelItem['modelType'] && modelItem['modelType'] == 'container'){
-				model.ModelType = 'container';
-			} else {
-				let links = modelItem['links'];
-				let elementLinks = matchLinks(links, baseLines);
-				model.Links = elementLinks;
-			}
+            let model = new SvgElementModel(element);
+            if (modelItem['modelType'] && modelItem['modelType'] == 'container') {
+                model.ModelType = 'container';
+            } else {
+                let links = modelItem['links'];
+                let elementLinks = matchLinks(links, baseLines);
+                model.Links = elementLinks;
+            }
 
             model.BusinessType = modelItem['type'];
             model.DefaultText = modelItem['defaultText'];
@@ -883,11 +902,11 @@ export function handleWpfMessage(message): string {
                 break;
             case 'createLineElement':
                 result = createLineElement(message['MessageContent']);
-				break;
-			// 设置图形缩放比例
-			case 'setShapeScale':
+                break;
+            // 设置图形缩放比例
+            case 'setShapeScale':
                 setShapeScale(message['MessageContent']);
-				break;
+                break;
             default:
                 break;
         }
@@ -926,8 +945,9 @@ function updateNodeText(data) {
     let canvasId = data['canvasId'];
     let nodeId = data['nodeId'];
     let text = data['nodeText'];
+    let index = data['textIndix'] || '0';
     let canvas = getCanvasById(canvasId);
-    canvas.UpdateElementText(nodeId, text);
+    canvas.UpdateElementText(nodeId, text, index);
 }
 
 // 更新图形颜色
@@ -1240,16 +1260,16 @@ export function createLineElement(data) {
     return JSON.stringify(result);
 }
 
-function setShapeScale(data){
-	let canvasId = data['canvasId'];
-	let nodeId = data['nodeId'];
-	let scale = data['scale'];
-	let canvas = getCanvasById(canvasId);
-	let element = canvas.GetSvgElementById(nodeId);
-	if (element && element.ElementType == 'shape'){
-		let shape = element as SvgElementShapeItem;
-		shape.SetScale(scale);
-	}
+function setShapeScale(data) {
+    let canvasId = data['canvasId'];
+    let nodeId = data['nodeId'];
+    let scale = data['scale'];
+    let canvas = getCanvasById(canvasId);
+    let element = canvas.GetSvgElementById(nodeId);
+    if (element && element.ElementType == 'shape') {
+        let shape = element as SvgElementShapeItem;
+        shape.SetScale(scale);
+    }
 }
 
 // handle wpf message end

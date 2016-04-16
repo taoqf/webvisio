@@ -1,9 +1,11 @@
-﻿<!DOCTYPE html>
+
+<!DOCTYPE html>
 
 <html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <title>状态图</title>
+	<meta charset="utf-8" />
+	<title>状态图</title>
 
 	<link rel="stylesheet" type="text/css" href="../css/drawing-basic.css">
 	<link rel="stylesheet" href="../css/victop.css">
@@ -11,167 +13,177 @@
 	<script type="text/javascript" src='../js-src/dojo/dojo.js'></script>
 	<script type="text/javascript">
 		var drawObj;
+
 		function submitWPF(type, content) {
 			var param = {};
 			param.MessageType = type;
 			param.MessageContent = content;
 			// CCharpExtension.SendMessage(JSON.stringify(param));
 		}
+
 		function excuteFormWPF(data) {
 			return drawObj.handleWpfMessage(data);
 		}
 
-		require(['feidao/victopDrawing','dojo/domReady'],function(
+		require(['feidao/victopDrawing', 'dojo/domReady'], function(
 			victopDrawing,
 			domReady
-		){
+		) {
 			//state shape define
 			var shapeDefine = {
-					'fsm.state': {
-						elements: [{
-							svgType: 'rect',
-							attrs: {
-								fill:'url(#white2lightgray)',
-								x:'2',
-								y:'2',
-								rx:'5',
-								ry:'5',
-								width:'90',
-								height:'60',
-								stroke:'#808080'
-							}
-						},{
-							svgType: 'path',
-							attrs: {
-								stroke:'#A0A0A0',
-								'stroke-width':'1',
-								d:'M2.5 20 H91.5'
-							}
-						}],
-						text:{
-							   attrs: {
-								   x:0,
-								   y:0,
-								   dx:5,
-								   dy:18
-						   		}
-					   		},
-						height:'65',
-						width:'95'
-				   	},
-				    'fsm.state_start': {
-					   elements: [{
-						   svgType: 'circle',
-						   attrs: {
-							   fill:'url(#white2lightgray)',
-							   r:'24',
-							   cx:'25',
-							   cy:'25',
-							   stroke:'#808080'
-						   }
-					   }],
-					   text:{
-							  attrs: {
-								  x:0,
-								  y:0,
-								  dx:5,
-								  dy:30
-							   }
-						   },
-					   height:'50',
-					   width:'50'
-				  	 },
-				  	'fsm.state_end': {
-					  elements: [{
-						   svgType: 'circle',
-						   attrs: {
-							   fill:'url(#white2lightgray)',
-							   r:'24',
-							   cx:'25',
-							   cy:'25',
-							   stroke:'#808080'
-						   	}
-						   },{
-							   svgType: 'circle',
-							   attrs: {
-								   fill:'#fff',
-								   r:'14',
-								   cx:'25',
-								   cy:'25',
-								   stroke:'#808080'
-							   }
-					   }],
-					  text:{
-							 attrs: {
-								 x:0,
-								 y:0,
-								 dx:5,
-								 dy:30
-							  }
-						  },
-					  height:'50',
-					  width:'50'
-				  	},
-				  	'fsm.hub': {
- 					 elements: [{
- 						 svgType: 'circle',
- 						 attrs: {
- 							 fill:'url(#white2gray)',
- 							 r:'24',
- 							 cx:'25',
- 							 cy:'25',
-							 stroke:'#808080'
- 						 }
- 					 }],
- 					 text:{
- 							attrs: {
- 								x:0,
- 								y:0,
- 								dx:5,
- 								dy:30
- 							 }
- 						 },
-	 				 height:'50',
-	 				 width:'50'
-	 				}
+				'fsm.state': {
+					elements: [{
+						svgType: 'rect',
+						attrs: {
+							fill: 'url(#white2lightgray)',
+							x: '2',
+							y: '2',
+							rx: '10',
+							ry: '10',
+							width: '200',
+							height: '120',
+							stroke: '#808080'
+						}
+					}, {
+						svgType: 'path',
+						attrs: {
+							stroke: '#A0A0A0',
+							'stroke-width': '1',
+							d: 'M2 35 H202'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: '20',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}, {
+						attrs: {
+							positionX: '20',
+							positionY: '50',
+							dy: 3
+						}
+					}],
+					height: '50',
+					width: '82',
+					scale: '0.4'
+				},
+				'fsm.state_start': {
+					elements: [{
+						svgType: 'circle',
+						attrs: {
+							fill: 'url(#white2lightgray)',
+							r: '24',
+							cx: '25',
+							cy: '25',
+							stroke: '#808080'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '50',
+					width: '50'
+				},
+				'fsm.state_end': {
+					elements: [{
+						svgType: 'circle',
+						attrs: {
+							fill: 'url(#white2lightgray)',
+							r: '24',
+							cx: '25',
+							cy: '25',
+							stroke: '#808080'
+						}
+					}, {
+						svgType: 'circle',
+						attrs: {
+							fill: '#fff',
+							r: '14',
+							cx: '25',
+							cy: '25',
+							stroke: '#808080'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '50',
+					width: '50'
+				},
+				'fsm.hub': {
+					elements: [{
+						svgType: 'circle',
+						attrs: {
+							fill: 'url(#white2gray)',
+							r: '24',
+							cx: '25',
+							cy: '25',
+							stroke: '#808080'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '50',
+					width: '50'
+				}
 			};
 			var lines = [{
-					name:'link1',
-					defaultText:'转换',
-					businessType:'',
-					class:'solidLine'
-				}];
-			domReady(function(){
+				name: 'link1',
+				defaultText: '转换',
+				businessType: '',
+				class: 'solidLine'
+			}];
+			domReady(function() {
 				var params = {
-					width:1200,
-					height:1000,
-					shapeDefine:shapeDefine,
-					lineModels:lines,
+					width: 1200,
+					height: 1000,
+					shapeDefine: shapeDefine,
+					lineModels: lines,
 					// runInWpf:true,
-					models:[{
-						id:'state',
-						model:'fsm.state',
-						type:'fsmState',
-						links:['link1'],
-						defaultText:'状态'
-					},{
-						id:'stateStart',
-						model:'fsm.state_start',
-						type:'fsmStateStart',
-						links:['link1'],
-						defaultText:'初始状态'
-					},{
-						id:'hub',
-						model:'fsm.hub',
-						type:'fsmHub',
-						links:['link1'],
-						defaultText:'集线器'
-					},{
-						id:'stateEnd',
-						model:'fsm.state_end',
-						type:'fsmStateEnd',
-						links:['link1'],
-						defaultText:'终止状态'
+					models: [{
+						id: 'state',
+						model: 'fsm.state',
+						type: 'fsmState',
+						links: ['link1'],
+						defaultText: '状态',
+						showText: true
+					}, {
+						id: 'stateStart',
+						model: 'fsm.state_start',
+						type: 'fsmStateStart',
+						links: ['link1'],
+						defaultText: '初始状态'
+					}, {
+						id: 'hub',
+						model: 'fsm.hub',
+						type: 'fsmHub',
+						links: ['link1'],
+						defaultText: '集线器'
+					}, {
+						id: 'stateEnd',
+						model: 'fsm.state_end',
+						type: 'fsmStateEnd',
+						links: ['link1'],
+						defaultText: '终止状态'
 					}]
 				}
 				victopDrawing.initCanvas(params);
@@ -181,6 +193,7 @@
 		});
 	</script>
 </head>
+
 <body>
 	<!--画布预定义-->
 	<svg id="svgDefs" xmlns="http://www.w3.org/2000/svg" width="0" height='0'>
@@ -192,23 +205,23 @@
 				<path d="M2,2 L2,11 L10,6 L2,2" style="fill: #6495ED;" />
 			</marker>
 			<linearGradient id="white2lightgray" x1="0%" y1="0%" x2="0%" y2="100%">
-				<stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1"/>
-				<stop offset="100%" style="stop-color:rgb(248,248,255);stop-opacity:1"/>
+				<stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1" />
+				<stop offset="100%" style="stop-color:rgb(248,248,255);stop-opacity:1" />
 			</linearGradient>
 			<linearGradient id="white2gray" x1="0%" y1="0%" x2="0%" y2="100%">
-				<stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1"/>
-				<stop offset="100%" style="stop-color:rgb(141,141,154);stop-opacity:1"/>
+				<stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1" />
+				<stop offset="100%" style="stop-color:rgb(141,141,154);stop-opacity:1" />
 			</linearGradient>
 		</defs>
 	</svg>
 	<!--模具组合-->
-    <div class="stencil-container" style="width:135px;">
+	<div class="stencil-container" style="width:135px;">
 		<div id="stencilContainer" class="modelContainer">
 		</div>
-    </div>
+	</div>
 	<!--画布缩进-->
 	<div class="splitter-container" style="left:135px;">
-		<div class="splitter" id="splitterBtn" fold ='false'>
+		<div class="splitter" id="splitterBtn" fold='false'>
 			<i class="vicons">&#xe738;</i>
 		</div>
 	</div>

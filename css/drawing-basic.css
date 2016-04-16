@@ -102,8 +102,7 @@
 	height: 30px;
 	line-height: 30px;
 	padding: 0 10px;
-	background-color: #eee;
-	opacity: 0.8;
+	background-color: rgba(232, 232, 232, 0.37);
 	border-radius: 15px;
 }
 

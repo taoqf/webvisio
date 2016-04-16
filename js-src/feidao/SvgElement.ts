@@ -24,6 +24,7 @@ export class SvgElementBase implements ISelectable {
     //图形是否选中状态
     public isSelected: boolean = false;
     constructor(svgElement: SVGSVGElement, svgCanvas: SvgCanvas, id?: string) {
+        svgElement.removeAttribute('transform');
         this.svgElement = svgElement;
         this.svgCanvas = svgCanvas;
         if (!id) {
@@ -122,23 +123,14 @@ export class SvgElementShapeItem extends SvgElementBase {
     private relativeOffsetX: number;//相对偏移
     private relativeOffsetY: number;
     private scale: number[] = [1, 1];
-	private textSvg:HTMLElement;
+    private textSvgs: Element[] = [];
+    private textArrays: string[];
+	private shapeColor:string;
     constructor(svgElement: SVGSVGElement, svgCanvas: SvgCanvas, id?: string) {
         super(svgElement, svgCanvas, id);
         this.elementType = 'shape';
-
-        let text = '';
-        let nodes = this.svgElement.childNodes;
-        for (let i = 0; i < nodes.length; i++) {
-            if (nodes[i].nodeName == 'text') {
-                let text_node = nodes[i] as HTMLElement;
-                text = text_node.innerHTML.trim();
-				this.textSvg = text_node;
-                break;
-            }
-        }
         this.svgElement.setAttribute('cursor', 'default');
-		this.centerText();
+        this.InitTextNode();
         //元素加载事件
         this.RegisterEvent();
     }
@@ -259,6 +251,19 @@ export class SvgElementShapeItem extends SvgElementBase {
         return bbox;
     }
 
+    // 初始化text node，设置text node的偏移量并构造tspans缓存
+    public InitTextNode() {
+        let nodes = this.svgElement.childNodes;
+		this.textArrays = new Array();
+        for (let i = 0; i < nodes.length; i++) {
+            if (nodes[i].nodeName == 'text') {
+                let text_node = nodes[i] as HTMLElement;
+                this.TranslateText(text_node);
+                this.textSvgs.push(text_node);
+            }
+        }
+    }
+
     // 设置scale
     public SetScale(scale) {
         let scalableGroup = this.GetShapeGroup();
@@ -274,33 +279,67 @@ export class SvgElementShapeItem extends SvgElementBase {
             this.svgCanvas.ReomveSelectRect(this);
             this.svgCanvas.CreateSelectRect(this);
         }
-		this.centerText();
+
+        for (let i = 0; i < this.textSvgs.length; i++) {
+            let textNode = this.textSvgs[i];
+			this.TranslateText(textNode);
+        }
     }
 
-	// 设置text
-	public SetText(text: String, isHide?: boolean) {
-		if (isHide || text.trim().length == 0) {
-			this.textSvg.setAttribute('display', 'none');
-			this.text = '';
-			this.textSvg.innerHTML = '';
-		} else if (text.trim().length > 0) {
-			this.textSvg.removeAttribute('display');
-			this.text = text;
-			this.textSvg.innerHTML = text.toString();
+    // 设置text
+    public SetText(text: string, isHide?: boolean, textIdx?: number) {
+        let textSvg = this.textSvgs[0] as HTMLElement;
+        if (textIdx) {
+            textSvg = this.textSvgs[textIdx] as HTMLElement;
+			this.textArrays[textIdx] = text;
+        }else {
+			this.textArrays[0] = text;
 		}
-	}
+        if (textSvg) {
+            if (isHide || text.trim().length == 0) {
+                textSvg.setAttribute('display', 'none');
+                this.text = '';
+                textSvg.innerHTML = '';
+            } else if (text.trim().length > 0) {
+                textSvg.removeAttribute('display');
+                this.text = text;
+                textSvg.innerHTML = text.toString();
+            }
+        }
+    }
 
-	// 设置图形颜色
-	public SetColor(color) {
-		let firstChild = this.GetFirstShapeElement();
-		firstChild.setAttribute('fill', color);
-	}
+    // 设置图形颜色
+    public SetColor(color) {
+        let firstChild = this.GetFirstShapeElement();
+        firstChild.setAttribute('fill', color);
+		this.shapeColor = color;
+    }
 
-	// 将text位置设置为图形中心
-	private centerText(){
-		let centerPoint = SvgUtility.GetElementCenterPoint(this,this.svgCanvas.CanvasScale);
-		let ctm = this.svgElement.getCTM();
-		this.textSvg.setAttribute('transform','translate('+(centerPoint[0] - ctm.e)+','+(centerPoint[1] - ctm.f)+')');
+    // 设置text的translate
+    private TranslateText(textNode) {
+        let centerPoint = SvgUtility.GetElementCenterPoint(this, this.svgCanvas.CanvasScale);
+        let ctm = this.svgElement.getCTM();
+        let centerX = centerPoint[0] - ctm.e;
+        let centerY = centerPoint[1] - ctm.f;
+
+		let translateX = textNode.getAttribute('positionX')||0;
+		let translateY = textNode.getAttribute('positionY')||0;
+        if (translateX == 'center') {
+            translateX = centerX;
+        }
+        if (translateY == 'center') {
+            translateY = centerY;
+        }
+
+        textNode.setAttribute('transform', 'translate(' + translateX + ',' + translateY + ')');
+    }
+
+	get ShapeColor(){
+		return this.shapeColor;
+	}
+	
+	get Text(){
+		return this.textArrays.join('|');;
 	}
 
     get Scale() {

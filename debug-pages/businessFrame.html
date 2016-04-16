@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
 <html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <title>业务架构</title>
+	<meta charset="utf-8" />
+	<title>业务架构</title>
 
 	<link rel="stylesheet" type="text/css" href="../css/drawing-basic.css">
 	<link rel="stylesheet" href="../css/victop.css">
@@ -11,110 +12,93 @@
 	<script type="text/javascript" src='../js-src/dojo/dojo.js'></script>
 	<script type="text/javascript">
 		var drawObj;
+
 		function submitWPF(type, content) {
 			var param = {};
 			param.MessageType = type;
 			param.MessageContent = content;
 			CCharpExtension.SendMessage(JSON.stringify(param));
 		}
+
 		function excuteFormWPF(data) {
 			return drawObj.handleWpfMessage(data);
 		}
 
-		require(['feidao/victopDrawing','dojo/domReady'],function(
+		require(['feidao/victopDrawing', 'dojo/domReady'], function(
 			victopDrawing,
 			domReady
-		){
+		) {
 			//业务架构 shape define
 			var shapeDefine = {
-					'framework.business.uint': {
-						elements: [{
-							svgType: 'path',
-							attrs: {
-								fill:'#6495ED',
-								d:'M0 0 H80 V50 H0 Z'
-							}
-						}],
-						text:{
-							   attrs: {
-								   x:0,
-								   y:0,
-								   dx:10,
-								   dy:30
-						   		}
-					   		},
-						height:'50',
-						width:'80'
-				   },
-				   'framework.business.uint_copy': {
-					   elements: [{
-						   svgType: 'path',
-						   attrs: {
-							   fill:'#FFA500',
-							   d:'M0 0 H80 V50 H0 Z'
-						   }
-					   }],
-					   text:{
-							  attrs: {
-								  x:0,
-								  y:0,
-								  dx:10,
-								  dy:30
-							   }
-						   },
-					   height:'50',
-					   width:'80'
-				  },
-				  'framework.business.uint_combine': {
-					  elements: [{
-						  svgType: 'path',
-						  attrs: {
-							  fill:'#8FBC8F',
-							  d:'M0 30 L40 0 L80 30 L40 60 Z'
-						  }
-					  }],
-					  text:{
-							 attrs: {
-								 x:0,
-								 y:0,
-								 dx:5,
-								 dy:35
-							  }
-						  },
-					  height:'60',
-					  width:'80'
-				 },
-				 'framework.business.business': {
-					 elements: [{
-						 svgType: 'circle',
-						 attrs: {
-							 fill:'white',
-							 stroke:'#D85EAB',
-							 'stroke-width':"2",
-							 r:'38',
-							 cx:'40',
-							 cy:'40'
-						 }
-					 }],
-					 text:{
-							attrs: {
-								x:0,
-								y:0,
-								dx:10,
-								dy:45
-							 }
-						 },
-				 	 height:'80',
-				 	width:'80'
+				'framework.business.uint': {
+					elements: [{
+						svgType: 'path',
+						attrs: {
+							fill: '#6495ED',
+							d: 'M0 0 H80 V50 H0 Z'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '50',
+					width: '80'
 				},
+				'framework.business.uint_combine': {
+					elements: [{
+						svgType: 'path',
+						attrs: {
+							fill: '#8FBC8F',
+							d: 'M0 30 L40 0 L80 30 L40 60 Z'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '60',
+					width: '80'
+				},
+				'framework.business.business': {
+					elements: [{
+						svgType: 'circle',
+						attrs: {
+							fill: 'white',
+							stroke: '#D85EAB',
+							'stroke-width': "2",
+							r: '38',
+							cx: '40',
+							cy: '40'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: 'center',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}],
+					height: '80',
+					width: '80'
+				}
 			};
 			var lines = [{
-					name:'link1',
-					defaultText:'连接线',
-					businessType:'连接线',
-					class:'solidLine'
-				}];
-			domReady(function(){
+				name: 'link1',
+				defaultText: '连接线',
+				businessType: '连接线',
+				class: 'solidLine'
+			}];
+			domReady(function() {
 				var params = {
 					width:1200,
 					height:1000,
@@ -152,12 +136,13 @@
 		});
 	</script>
 </head>
+
 <body>
 	<!--模具组合-->
-    <div class="stencil-container" style="width:135px;">
+	<div class="stencil-container" style="width:135px;">
 		<div id="stencilContainer" class="modelContainer">
 		</div>
-    </div>
+	</div>
 	<!--画布预定义-->
 	<svg id="svgDefs" xmlns="http://www.w3.org/2000/svg" width="0" height='0'>
 		<defs>
@@ -168,12 +153,12 @@
 	</svg>
 	<!--画布缩进-->
 	<div class="splitter-container" style="left:135px;">
-		<div class="splitter" id="splitterBtn" fold ='false'>
+		<div class="splitter" id="splitterBtn" fold='false'>
 			<i class="vicons">&#xe738;</i>
 		</div>
 	</div>
 	<!--画布-->
-    <div class="paper-container" id="svgContainer" style="left:152px;padding-left: 5px; padding-top: 5px;">
+	<div class="paper-container" id="svgContainer" style="left:152px;padding-left: 5px; padding-top: 5px;">
 		<div class="paper-scroller" id="svgScroller">
 			<div class="paper" id="svgPaper" style="margin-bottom: 4px; margin-right: 210px;">
 			</div>

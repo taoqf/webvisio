@@ -395,9 +395,14 @@ export class SvgCanvas {
     }
 
     // 更新element 的文本
-    public UpdateElementText(id, text) {
+    public UpdateElementText(id, text, textIdx?) {
         let element = this.GetSvgElementById(id);
-        element.SetText(text);
+		if(element.ElementType == 'shape'){
+			let shape = element as SvgElementShapeItem;
+			shape.SetText(text,false,textIdx);
+		}else if (element.ElementType == 'line'){
+			element.SetText(text);
+		}
     }
 
     // 连接指定的元素

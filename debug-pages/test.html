@@ -39,14 +39,14 @@
 							d: 'M0 0 H80 V50 H0 Z'
 						}
 					}],
-					text: {
+					texts:[{
 						attrs: {
-							x: 0,
-							y: 0,
-							dx: 10,
-							dy: 30
+							positionX:'center',
+							positionY:'center',
+							'text-anchor':'middle',
+							dy:3
 						}
-					},
+					}],
 					height: '50',
 					width: '80'
 				},
@@ -58,14 +58,14 @@
 							d: 'M0 0 H80 V50 H0 Z'
 						}
 					}],
-					text: {
+					texts:[{
 						attrs: {
-							x: 0,
-							y: 0,
-							dx: 10,
-							dy: 30
+							positionX:'center',
+							positionY:'center',
+							'text-anchor':'middle',
+							dy:3
 						}
-					},
+					}],
 					height: '50',
 					width: '80'
 				},
@@ -77,14 +77,14 @@
 							d: 'M0 30 L40 0 L80 30 L40 60 Z'
 						}
 					}],
-					text: {
+					texts:[{
 						attrs: {
-							x: 0,
-							y: 0,
-							dx: 5,
-							dy: 35
+							positionX:'center',
+							positionY:'center',
+							'text-anchor':'middle',
+							dy:3
 						}
-					},
+					}],
 					height: '60',
 					width: '80'
 				},
@@ -100,14 +100,14 @@
 							cy: '40'
 						}
 					}],
-					text: {
+					texts:[{
 						attrs: {
-							x: 0,
-							y: 0,
-							dx: 10,
-							dy: 45
+							positionX:'center',
+							positionY:'center',
+							'text-anchor':'middle',
+							dy:3
 						}
-					},
+					}],
 					height: '80',
 					width: '80'
 				},
@@ -126,14 +126,14 @@
 							height: 60
 						}
 					}],
-					text: {
+					texts:[{
 						attrs: {
-							x: 0,
-							y: 0,
-							dx: 40,
-							dy: 10
+							positionX:'center',
+							positionY:'20',
+							'text-anchor':'middle',
+							dy:3
 						}
-					},
+					}],
 					height: '65',
 					width: '95'
 				}
@@ -157,28 +157,32 @@
 						type: 'businessUint',
 						links: ['link1'],
 						defaultText: '业务主体',
-						mouseMenu: 'delete'
+						mouseMenu: 'delete',
+						showText: true
 					}, {
 						id: 'businessUintCopy',
 						model: 'framework.business.uint_copy',
 						type: 'businessUintCopy',
 						links: ['link1'],
 						defaultText: '业务主体副本',
-						mouseMenu: 'copy'
+						mouseMenu: 'copy',
+						showText: true
 					}, {
 						id: 'businessCombine',
 						model: 'framework.business.uint_combine',
 						type: 'businessCombine',
 						links: ['link1'],
 						defaultText: '业务主体组合',
-						mouseMenu: 'delete,copy'
+						mouseMenu: 'delete,copy',
+						showText: true
 					}, {
 						id: 'business',
 						model: 'framework.business.business',
 						type: 'business',
 						links: ['link1'],
 						defaultText: '业务',
-						mouseMenu: 'delete,copy'
+						mouseMenu: 'delete,copy',
+						showText: true
 					}, {
 						id: 'container',
 						model: 'container',

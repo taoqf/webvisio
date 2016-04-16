@@ -289,7 +289,7 @@ export class SvgElementShapeItem extends SvgElementBase {
     // 设置text
     public SetText(text: string, isHide?: boolean, textIdx?: number) {
         let textSvg = this.textSvgs[0] as HTMLElement;
-        if (textIdx) {
+        if (textIdx != undefined) {
             textSvg = this.textSvgs[textIdx] as HTMLElement;
 			this.textArrays[textIdx] = text;
         }else {
@@ -337,7 +337,7 @@ export class SvgElementShapeItem extends SvgElementBase {
 	get ShapeColor(){
 		return this.shapeColor;
 	}
-	
+
 	get Text(){
 		return this.textArrays.join('|');;
 	}

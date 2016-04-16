@@ -952,17 +952,17 @@ function updateNodeData(data) {
 }
 
 // 更新元素text
-function updateNodeText(data) {
+export function updateNodeText(data) {
     let canvasId = data['canvasId'];
     let nodeId = data['nodeId'];
     let text = data['nodeText'];
-    let index = data['textIndix'] || '0';
+    let index = data['textIndex'] || '0';
     let canvas = getCanvasById(canvasId);
     canvas.UpdateElementText(nodeId, text, index);
 }
 
 // 更新图形颜色
-function updateShapeColor(data) {
+export function updateShapeColor(data) {
     let canvasId = data['canvasId'];
     let nodeId = data['nodeId'];
     let color = data['color'];

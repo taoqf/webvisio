@@ -31,6 +31,45 @@
 		) {
 			//业务架构 shape define
 			var shapeDefine = {
+				'fsm.state': {
+					elements: [{
+						svgType: 'rect',
+						attrs: {
+							fill: 'url(#white2lightgray)',
+							x: '2',
+							y: '2',
+							rx: '10',
+							ry: '10',
+							width: '200',
+							height: '120',
+							stroke: '#808080'
+						}
+					}, {
+						svgType: 'path',
+						attrs: {
+							stroke: '#A0A0A0',
+							'stroke-width': '1',
+							d: 'M2 35 H202'
+						}
+					}],
+					texts: [{
+						attrs: {
+							positionX: 'center',
+							positionY: '20',
+							'text-anchor': 'middle',
+							dy: 3
+						}
+					}, {
+						attrs: {
+							positionX: '20',
+							positionY: '50',
+							dy: 3
+						}
+					}],
+					height: '50',
+					width: '82',
+					scale: '0.4'
+				},
 				'framework.business.uint': {
 					elements: [{
 						svgType: 'path',
@@ -152,6 +191,13 @@
 					lineModels: lines,
 					// runInWpf:true,
 					models: [{
+						id: 'state',
+						model: 'fsm.state',
+						type: 'fsmState',
+						links: ['link1'],
+						defaultText: '状态',
+						showText: true
+					},{
 						id: 'businessUint',
 						model: 'framework.business.uint',
 						type: 'businessUint',
@@ -254,6 +300,44 @@
 					};
 					victopDrawing.createLineElement(data);
 				}
+
+				btnChangeColor.onclick = function (e) {
+					var id = document.getElementById('input_shape_id').value;
+					var color = document.getElementById('input_color').value;
+					if(id && color){
+						var shapeData = {
+							canvasId: victopDrawing.activedPageSvg.Id,
+							nodeId: id,
+							color: color
+						};
+						victopDrawing.updateShapeColor(shapeData);
+					}
+				}
+
+				btnUpdateText.onclick = function (e) {
+					var id = document.getElementById('input_shape_id').value;
+					var input_text1 = document.getElementById('input_text1').value;
+					var input_text2 = document.getElementById('input_text2').value;
+					if(id && input_text1){
+						var shapeData = {
+							canvasId: victopDrawing.activedPageSvg.Id,
+							nodeId: id,
+							nodeText: input_text1,
+
+						};
+						victopDrawing.updateNodeText(shapeData);
+					}
+					if (id && input_text2) {
+						var shapeData = {
+							canvasId: victopDrawing.activedPageSvg.Id,
+							nodeId: id,
+							nodeText: input_text2,
+							textIndex:'1'
+						};
+						victopDrawing.updateNodeText(shapeData);
+					}
+				}
+
 			})
 		});
 	</script>
@@ -263,12 +347,6 @@
 	<!--模具组合-->
 	<div class="stencil-container" style="width:135px;">
 		<div id="stencilContainer" class="modelContainer">
-			<button id="btnExportData">导出数据</button>
-			<button id="btnExportImg">导出Img</button>
-			<button id="btnImportData">导入数据</button>
-			<button id="btnImportTemplate">导入模板</button>
-			<button id="btnCreateShape">生成图形</button>
-			<button id="btnConnectShape">连接图形</button>
 		</div>
 	</div>
 	<!--画布预定义-->
@@ -277,6 +355,14 @@
 			<marker id="markerArrow" markerWidth="13" markerHeight="13" refx="10" refy="6" orient="auto">
 				<path d="M2,2 L2,11 L10,6 L2,2" style="fill: #000000;" />
 			</marker>
+			<linearGradient id="white2lightgray" x1="0%" y1="0%" x2="0%" y2="100%">
+				<stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1" />
+				<stop offset="100%" style="stop-color:rgb(248,248,255);stop-opacity:1" />
+			</linearGradient>
+			<linearGradient id="white2gray" x1="0%" y1="0%" x2="0%" y2="100%">
+				<stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1" />
+				<stop offset="100%" style="stop-color:rgb(141,141,154);stop-opacity:1" />
+			</linearGradient>
 		</defs>
 	</svg>
 	<!--画布缩进-->
@@ -303,6 +389,22 @@
 			<li id='menuDelete' class='menu-value' operate="deleteNode">删除</li>
 			<li id='menuClone' class='menu-value' operate="createCopy">生成副本</li>
 		</ul>
+	</div>
+
+	<!--测试栏 -->
+	<div style="position: absolute;background: rgba(74, 78, 84, 0.86); width: 300px; height: 600px; right: 30px;padding:10px;">
+		<button id="btnExportData">导出数据</button>
+		<button id="btnExportImg">导出Img</button>
+		<button id="btnImportData">导入数据</button>
+		<button id="btnImportTemplate">导入模板</button>
+		<button id="btnCreateShape">生成图形</button>
+		<button id="btnConnectShape">连接图形</button>
+		<button id="btnChangeColor">更改shape颜色</button>
+		<button id="btnUpdateText">更改shape文本</button>
+		<input style="display:block;margin-top:10px;height:30px;line-height:30px;width: 200px;" type="text" id='input_shape_id' placeholder='图形ID'/>
+		<input style="display:block;margin-top:10px;height:30px;line-height:30px;width: 200px;" type="text" id='input_color' placeholder='颜色'/>
+		<input style="display:block;margin-top:10px;height:30px;line-height:30px;width: 200px;" type="text" id='input_text1' placeholder='文本一'/>
+		<input style="display:block;margin-top:10px;height:30px;line-height:30px;width: 200px;" type="text" id='input_text2' placeholder='文本二'/>
 	</div>
 </body>
 

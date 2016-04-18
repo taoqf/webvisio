@@ -272,6 +272,7 @@ export class SvgElementShapeItem extends SvgElementBase {
 		let scaleX = (width/originalW).toFixed(1);
 		let scaleY = (height/originalH).toFixed(1);
 		this.SetScale(scaleX+','+scaleY);
+
 	}
 
     // 设置scale
@@ -294,7 +295,19 @@ export class SvgElementShapeItem extends SvgElementBase {
             let textNode = this.textSvgs[i];
 			this.TranslateText(textNode);
         }
+		// 更新 已连接的线
+		this.updateLines();
     }
+	// 更新当前已连接线的path
+	private updateLines(){
+		let elementLines = this.GetElementLines();
+		let lines = elementLines.sourceLines.concat(elementLines.targetLines);
+		let count = lines.length;
+		for (let i = 0; i < count; i++){
+			let line = lines[i];
+			line.UpdateLinePath();
+		}
+	}
 
     // 设置text
     public SetText(text: string, isHide?: boolean, textIdx?: number) {

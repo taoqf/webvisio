@@ -526,10 +526,10 @@ function importCanvasByData(data, isTemplate?) {
         if (shape['shapeColor']) {
             shapeItem.SetColor(shape['shapeColor']);
         }
-        let texts = shape['text'] || ''.split('|');
+        let texts = (shape['text'] || '').split('|');
         if (typeof (texts) == 'object') {
             for (let k = 0; k < texts.length; k++) {
-                shapeItem.SetText(texts[k]);
+                shapeItem.SetText(texts[k], false, k);
             }
         } else {
             shapeItem.SetText(texts);

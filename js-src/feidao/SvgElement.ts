@@ -264,6 +264,16 @@ export class SvgElementShapeItem extends SvgElementBase {
         }
     }
 
+	// 重设shape大小
+	public Resize(width,height,left,top){
+		let bbox = this.GetShapeBBox();
+		let originalW = bbox.width/this.scale[0];
+		let originalH = bbox.height/this.scale[1];
+		let scaleX = (width/originalW).toFixed(1);
+		let scaleY = (height/originalH).toFixed(1);
+		this.SetScale(scaleX+','+scaleY);
+	}
+
     // 设置scale
     public SetScale(scale) {
         let scalableGroup = this.GetShapeGroup();
@@ -318,18 +328,22 @@ export class SvgElementShapeItem extends SvgElementBase {
     // 设置text的translate
     private TranslateText(textNode) {
         let centerPoint = SvgUtility.GetElementCenterPoint(this, this.svgCanvas.CanvasScale);
-        let ctm = this.svgElement.getCTM();
-        let centerX = centerPoint[0] - ctm.e;
-        let centerY = centerPoint[1] - ctm.f;
-
+		let canvasScale = this.svgCanvas.CanvasScale;
 		let translateX = textNode.getAttribute('positionX')||0;
 		let translateY = textNode.getAttribute('positionY')||0;
+		let bbox = this.GetShapeBBox();
+		let centerX = (bbox.width/canvasScale)/2;
+		let centerY = (bbox.height/canvasScale)/2;
         if (translateX == 'center') {
             translateX = centerX;
-        }
+        } else {
+			translateX = translateX * this.scale[0];
+		}
         if (translateY == 'center') {
             translateY = centerY;
-        }
+        } else {
+			translateY = translateY * this.scale[1];
+		}
 
         textNode.setAttribute('transform', 'translate(' + translateX + ',' + translateY + ')');
     }

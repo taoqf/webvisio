@@ -130,12 +130,12 @@ function registerPageEvent() {
         this.style = "";
         isDragging = false;
         selectElementsBySelection();
-		if (activedPageSvg.SelectedElement &&activedPageSvg.SelectedElement.ElementType == 'shape') {
-			let element = activedPageSvg.SelectedElement as SvgElementShapeItem;
-			registerResizeHandler(element);
-		} else {
-			hideResizeDiv();
-		}
+        if (activedPageSvg.SelectedElement && activedPageSvg.SelectedElement.ElementType == 'shape') {
+            let element = activedPageSvg.SelectedElement as SvgElementShapeItem;
+            registerResizeHandler(element);
+        } else {
+            hideResizeDiv();
+        }
     }
 
     // 鼠标移动事件，移动画布scroll
@@ -300,11 +300,11 @@ function registerPageEvent() {
         // set svg group scale and svg width & height
         let real_clientX = clientX - svgOffsetX;
         let real_clientY = clientY - svgOffsetY;
-        let scroll_x = mouseleft * currScale / (currScale - scaleUnit) - real_clientX;
-        let scroll_y = mousetop * currScale / (currScale - scaleUnit) - real_clientY;
+        let scroll_x = mouseleft * (1 + scaleUnit) - real_clientX;
+        let scroll_y = mousetop * (1 + scaleUnit) - real_clientY;
         if (!isZoom) {//画布缩小时，需要计算父div的偏移量
-            scroll_x = mouseleft / currScale / (currScale - scaleUnit) - real_clientX;
-            scroll_y = mousetop / currScale / (currScale - scaleUnit) - real_clientY;
+            scroll_x = mouseleft * (1 - scaleUnit) - real_clientX;
+            scroll_y = mousetop * (1 - scaleUnit) - real_clientY;
         }
 
         for (let i = 0; i < pageCount; i++) {
@@ -312,8 +312,8 @@ function registerPageEvent() {
             canvas.ScaleCanvas(currScale);
         }
 
-        scroller.scrollTop = scroll_x;
-        scroller.scrollLeft = scroll_y;
+		scroller.scrollLeft = scroll_x;
+        scroller.scrollTop = scroll_y;
 
         // show scale tips
         showScaleTips(currScale);
@@ -372,91 +372,91 @@ function registerPageEvent() {
 
 }
 
-function registerResizeHandler(shapeItem:SvgElementShapeItem){
+function registerResizeHandler(shapeItem: SvgElementShapeItem) {
 
-	let resizeDiv = document.getElementById("resizeDiv");
-	let oL = document.getElementsByClassName('resizeL')[0];
-	let oT = document.getElementsByClassName('resizeT')[0];
-	let oR = document.getElementsByClassName('resizeR')[0];
-	let oB = document.getElementsByClassName('resizeB')[0];
-	let oLT = document.getElementsByClassName('resizeLT')[0];
-	let oTR = document.getElementsByClassName('resizeTR')[0];
-	let oBR = document.getElementsByClassName('resizeBR')[0];
-	let oLB = document.getElementsByClassName('resizeLB')[0];
-	// resize handle
-	let dragMinWidth = 0;
-	let dragMinHeight = 0;
+    let resizeDiv = document.getElementById("resizeDiv");
+    let oL = document.getElementsByClassName('resizeL')[0];
+    let oT = document.getElementsByClassName('resizeT')[0];
+    let oR = document.getElementsByClassName('resizeR')[0];
+    let oB = document.getElementsByClassName('resizeB')[0];
+    let oLT = document.getElementsByClassName('resizeLT')[0];
+    let oTR = document.getElementsByClassName('resizeTR')[0];
+    let oBR = document.getElementsByClassName('resizeBR')[0];
+    let oLB = document.getElementsByClassName('resizeLB')[0];
+    // resize handle
+    let dragMinWidth = 0;
+    let dragMinHeight = 0;
 
-	let canvasScale = activedPageSvg.CanvasScale;
-	let firstElement = shapeItem.GetFirstShapeElement();
-	let elementBBox = shapeItem.GetShapeBBox();
-	let scale = shapeItem.Scale;
-	dragMinWidth = elementBBox.width/scale[0];
-	dragMinHeight = elementBBox.height/scale[1];
-	let rect = shapeItem.SvgElement.getBoundingClientRect();
-	let translate = shapeItem.Translate;
-	resizeDiv.style.left = (translate[0]+elementBBox.x*scale[0] -1)*canvasScale +'px';
-	resizeDiv.style.top = (translate[1]+elementBBox.y*scale[1] -1)*canvasScale +'px';
-	resizeDiv.style.width = elementBBox.width +'px';
-	resizeDiv.style.height = elementBBox.height + 'px';
-	resizeDiv.style.display = 'block';
+    let canvasScale = activedPageSvg.CanvasScale;
+    let firstElement = shapeItem.GetFirstShapeElement();
+    let elementBBox = shapeItem.GetShapeBBox();
+    let scale = shapeItem.Scale;
+    dragMinWidth = elementBBox.width / scale[0];
+    dragMinHeight = elementBBox.height / scale[1];
+    let rect = shapeItem.SvgElement.getBoundingClientRect();
+    let translate = shapeItem.Translate;
+    resizeDiv.style.left = (translate[0] + elementBBox.x * scale[0] - 1) * canvasScale + 'px';
+    resizeDiv.style.top = (translate[1] + elementBBox.y * scale[1] - 1) * canvasScale + 'px';
+    resizeDiv.style.width = elementBBox.width + 'px';
+    resizeDiv.style.height = elementBBox.height + 'px';
+    resizeDiv.style.display = 'block';
 
-	//四角
-	resize(resizeDiv, oLT, true, true, false, false);
-	resize(resizeDiv, oTR, false, true, false, false);
-	resize(resizeDiv, oBR, false, false, false, false);
-	resize(resizeDiv, oLB, true, false, false, false);
-	//四边
-	resize(resizeDiv, oL, true, false, false, true);
-	resize(resizeDiv, oT, false, true, true, false);
-	resize(resizeDiv, oR, false, false, false, true);
-	resize(resizeDiv, oB, false, false, true, false);
+    //四角
+    resize(resizeDiv, oLT, true, true, false, false);
+    resize(resizeDiv, oTR, false, true, false, false);
+    resize(resizeDiv, oBR, false, false, false, false);
+    resize(resizeDiv, oLB, true, false, false, false);
+    //四边
+    resize(resizeDiv, oL, true, false, false, true);
+    resize(resizeDiv, oT, false, true, true, false);
+    resize(resizeDiv, oR, false, false, false, true);
+    resize(resizeDiv, oB, false, false, true, false);
 
-	function resize(oParent, handle, isLeft, isTop, lockX, lockY) {
-		handle.onmousedown = function(event) {
-			// let event = event || window.event;
-			let disX = event.clientX - handle.offsetLeft;
-			let disY = event.clientY - handle.offsetTop;
-			let iParentTop = oParent.offsetTop;
-			let iParentLeft = oParent.offsetLeft;
-			let iParentWidth = oParent.offsetWidth;
-			let iParentHeight = oParent.offsetHeight;
-			document.onmousemove = function(event) {
-				let iL = event.clientX - disX;
-				let iT = event.clientY - disY;
-				let iW = isLeft ? iParentWidth - iL : handle.offsetWidth + iL;
-				let iH = isTop ? iParentHeight - iT : handle.offsetHeight + iT;
-				isLeft && (oParent.style.left = iParentLeft + iL + "px");
-				isTop && (oParent.style.top = iParentTop + iT + "px");
-				iW < dragMinWidth && (iW = dragMinWidth);
-				lockX || (oParent.style.width = iW + "px");
-				iH < dragMinHeight && (iH = dragMinHeight);
-				lockY || (oParent.style.height = iH + "px");
-				if ((isLeft && iW == dragMinWidth) || (isTop && iH == dragMinHeight)) document.onmousemove = null;
-				if (shapeItem) {
-					let resizeW = oParent.offsetWidth;
-					let resizeH = oParent.offsetHeight;
-					activedPageSvg.ResetHandlerPanel();
-					shapeItem.Resize(resizeW,resizeH,0,0);
-				}
-				return false;
-			};
-			document.onmouseup = function() {
-				if (activedPageSvg.SelectedElement){
-					activedPageSvg.ResetHandlerPanel(shapeItem);
-				}
-				document.onmousemove = null;
-				document.onmouseup = null;
-			};
-			return false;
-		}
-	};
+    function resize(oParent, handle, isLeft, isTop, lockX, lockY) {
+        handle.onmousedown = function(event) {
+            // let event = event || window.event;
+            let disX = event.clientX - handle.offsetLeft;
+            let disY = event.clientY - handle.offsetTop;
+            let iParentTop = oParent.offsetTop;
+            let iParentLeft = oParent.offsetLeft;
+            let iParentWidth = oParent.offsetWidth;
+            let iParentHeight = oParent.offsetHeight;
+            document.onmousemove = function(event) {
+                let iL = event.clientX - disX;
+                let iT = event.clientY - disY;
+                let iW = isLeft ? iParentWidth - iL : handle.offsetWidth + iL;
+                let iH = isTop ? iParentHeight - iT : handle.offsetHeight + iT;
+                isLeft && (oParent.style.left = iParentLeft + iL + "px");
+                isTop && (oParent.style.top = iParentTop + iT + "px");
+                iW < dragMinWidth && (iW = dragMinWidth);
+                lockX || (oParent.style.width = iW + "px");
+                iH < dragMinHeight && (iH = dragMinHeight);
+                lockY || (oParent.style.height = iH + "px");
+                if ((isLeft && iW == dragMinWidth) || (isTop && iH == dragMinHeight)) document.onmousemove = null;
+                if (shapeItem) {
+                    let resizeW = oParent.offsetWidth;
+                    let resizeH = oParent.offsetHeight;
+                    activedPageSvg.ResetHandlerPanel();
+                    shapeItem.Resize(resizeW, resizeH, 0, 0);
+                }
+                return false;
+            };
+            document.onmouseup = function() {
+                if (activedPageSvg.SelectedElement) {
+                    activedPageSvg.ResetHandlerPanel(shapeItem);
+                }
+                document.onmousemove = null;
+                document.onmouseup = null;
+            };
+            return false;
+        }
+    };
 
 }
 
-function hideResizeDiv(){
-	let resizeDiv = document.getElementById("resizeDiv");
-	resizeDiv.style.display = 'none';
+function hideResizeDiv() {
+    let resizeDiv = document.getElementById("resizeDiv");
+    resizeDiv.style.display = 'none';
 }
 
 // 导出页面数据
@@ -1518,12 +1518,12 @@ function elementAddedEvent(canvas, element) {
             canvas.SelectService.SetSelected(element);
             canvas.ClearSelectRect();
             canvas.CreateSelectRect(element);
-			registerResizeHandler(element);
+            registerResizeHandler(element);
         } else {
             canvas.SelectService.ClearCollection();
             canvas.ClearSelectRect();
             canvas.ActivedLine = element;
-			hideResizeDiv();
+            hideResizeDiv();
         }
         canvas.ResetHandlerPanel(element);
         return;
@@ -1609,7 +1609,7 @@ function elementDeletedEvent(canvas) {
 
 // 取消选中事件
 function cancelSelectEvent() {
-	hideResizeDiv();
+    hideResizeDiv();
     if (!runInWpf) {
         return;
     }

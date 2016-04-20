@@ -437,7 +437,7 @@ function registerResizeHandler(shapeItem: SvgElementShapeItem) {
                     let resizeW = oParent.offsetWidth;
                     let resizeH = oParent.offsetHeight;
                     activedPageSvg.ResetHandlerPanel();
-                    shapeItem.Resize(resizeW, resizeH, 0, 0);
+                    shapeItem.Resize(resizeW, resizeH, oParent.offsetLeft, oParent.offsetTop);
                 }
                 return false;
             };

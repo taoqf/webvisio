@@ -269,10 +269,10 @@ export class SvgElementShapeItem extends SvgElementBase {
 		let bbox = this.GetShapeBBox();
 		let originalW = bbox.width/this.scale[0];
 		let originalH = bbox.height/this.scale[1];
-		let scaleX = (width/originalW).toFixed(1);
-		let scaleY = (height/originalH).toFixed(1);
+		let scaleX = (width/originalW).toFixed(2);
+		let scaleY = (height/originalH).toFixed(2);
+		this.SetTanslate(left,top);
 		this.SetScale(scaleX+','+scaleY);
-
 	}
 
     // 设置scale
@@ -432,11 +432,11 @@ export class SvgElementLineItem extends SvgElementBase {
     private tangentLines: Element[];
 
     constructor(svgCanvas: SvgCanvas, source: SvgElementShapeItem, id?: string) {
-        this.source = source;
-        this.elementType = 'line';
-        let gElement = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'line' }]);
 
+		let gElement = SvgUtility.CreateSvgElement('g', [{ 'attr': 'class', 'val': 'line' }]);
         super(gElement as SVGSVGElement, svgCanvas, id);
+		this.source = source;
+		this.elementType = 'line';
 
         if (!id) {
             this.CreateTempLines();
@@ -914,10 +914,10 @@ export class SvgElementContainerItem extends SvgElementBase {
 
         let svgElement = gElement as SVGSVGElement;
 
+		super(svgElement, svgCanvas, id);
         this.width = width;
         this.height = height;
 
-        super(svgElement, svgCanvas, id);
         this.containerRectSvg = rectElement as SVGSVGElement;
         this.titleRectSvg = titleRectElement as SVGSVGElement;
         this.elementType = 'container';

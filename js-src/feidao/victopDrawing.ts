@@ -239,7 +239,6 @@ function registerPageEvent() {
             // 取消全选
             activedPageSvg.ClearSelectRect();
             activedPageSvg.SelectService.ClearCollection();
-            activedPageSvg.CreateSelectRect(activedPageSvg.SelectedElement);
             activedPageSvg.SelectService.SetSelected(activedPageSvg.SelectedElement);
 
             mouseMenuDiv.style.display = 'block';
@@ -253,13 +252,15 @@ function registerPageEvent() {
             mouseMenuDiv.style.left = menuLeft + 'px';
             mouseMenuDiv.style.top = menuTop + 'px';
             // 控制菜单显示
-            if (activedPageSvg.SelectedElement == activedPageSvg.Activedshape) {
-                let businessType = activedPageSvg.Activedshape.BusinessType;
-                let isCloned = activedPageSvg.Activedshape.ClonedId ? true : false;
+            if (activedPageSvg.SelectedElement.ElementType == 'shape') {
+                let shapeItem = activedPageSvg.GetActivedShape();
+				activedPageSvg.CreateSelectRect(shapeItem);
+                let businessType = shapeItem.BusinessType;
+                let isCloned = shapeItem.ClonedId ? true : false;
                 let shapeDefine = SvgUtility.findItemInArray('type', businessType, stencils);
                 let menuConfig = shapeDefine['mouseMenu'];
                 setMenuDisplay(menuConfig, isCloned);
-            } else if (activedPageSvg.SelectedElement == activedPageSvg.ActivedLine) {
+            } else if (activedPageSvg.SelectedElement.ElementType == 'line'){
                 setMenuDisplay('delete');
             }
         }
@@ -312,7 +313,7 @@ function registerPageEvent() {
             canvas.ScaleCanvas(currScale);
         }
 
-		scroller.scrollLeft = scroll_x;
+        scroller.scrollLeft = scroll_x;
         scroller.scrollTop = scroll_y;
 
         // show scale tips
@@ -334,20 +335,20 @@ function registerPageEvent() {
 
     // 右键菜单生成副本事件
     function createNodeCopy() {
-        if (activedPageSvg.SelectedElement &&
-            activedPageSvg.Activedshape == activedPageSvg.SelectedElement) {
-            beforeElementCloneEvent(activedPageSvg, activedPageSvg.Activedshape);
+        if (activedPageSvg.SelectedElement && activedPageSvg.SelectedElement.ElementType == 'shape') {
+            beforeElementCloneEvent(activedPageSvg, activedPageSvg.GetActivedShape());
         }
     }
 
     // 设置右键menu项的显示与隐藏
     function setMenuDisplay(config, isCloned?) {
+		mouseMenuDiv.style.display = 'none';
         if (!config) {
             return;
         }
+		menuDelete.removeAttribute('style');
+		menuClone.removeAttribute('style');
         let operates = config.split(',');
-        menuDelete.removeAttribute('style');
-        menuClone.removeAttribute('style');
         for (let i in operates) {
             let operate = operates[i];
             if (operate == 'delete') {
@@ -356,6 +357,7 @@ function registerPageEvent() {
                 menuClone.style.display = 'block';
             }
         }
+		mouseMenuDiv.style.display = 'block';
     }
 
     // 根据选择框的范围，选中页面元素
@@ -1279,7 +1281,6 @@ function selectElement(data) {
     // 设置画布上的选中
     canvas.SelectedElement = element;
     if (element.ElementType == 'shape') {
-        canvas.Activedshape = element;
         element.IsSelected = true;
         canvas.SelectService.SetSelected(element);
         canvas.ClearSelectRect();
@@ -1287,7 +1288,6 @@ function selectElement(data) {
     } else {
         canvas.SelectService.ClearCollection();
         canvas.ClearSelectRect();
-        canvas.ActivedLine = element;
     }
     canvas.ResetHandlerPanel(element);
 }
@@ -1513,7 +1513,6 @@ function elementAddedEvent(canvas, element) {
         // 设置画布上的选中
         canvas.SelectedElement = element;
         if (element.ElementType == 'shape') {
-            canvas.Activedshape = element;
             element.IsSelected = true;
             canvas.SelectService.SetSelected(element);
             canvas.ClearSelectRect();
@@ -1522,7 +1521,6 @@ function elementAddedEvent(canvas, element) {
         } else {
             canvas.SelectService.ClearCollection();
             canvas.ClearSelectRect();
-            canvas.ActivedLine = element;
             hideResizeDiv();
         }
         canvas.ResetHandlerPanel(element);

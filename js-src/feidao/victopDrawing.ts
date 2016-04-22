@@ -41,6 +41,10 @@ function initStencilArea(models) {
     }
 
     for (let i = 0, len = models.length; i < len; i++) {
+		let isHide = models[i]['hideInStencil'];
+		if (isHide){
+			continue;
+		}
         let gAttrs = [{ attr: 'class', val: 'Content' }];
         let shapeInfo = shapeDefine[models[i]['model']];
         let shapes = shapeInfo['elements'];
@@ -727,6 +731,10 @@ function createCanvasPage(el) {
     if (models) {
         for (let i = 0; i < models.length; i++) {
             let modelItem = models[i];
+			let isHide = modelItem['hideInStencil'];
+			if (isHide){
+				continue;
+			}
             let element = document.getElementById(modelItem['id']);
             let model = new SvgElementModel(element);
             if (modelItem['modelType'] && modelItem['modelType'] == 'container') {

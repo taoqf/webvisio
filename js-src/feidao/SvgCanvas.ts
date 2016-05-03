@@ -4,10 +4,6 @@ import {SvgElementLineItem} from './SvgElement';
 import {SvgElementContainerItem} from './SvgElement';
 import {SvgUtility} from './SvgUtility'
 
-export interface ISelectable {
-  isSelected: Boolean;
-}
-
 export class SelectService {
   private ISelectableCollection: ISelectable[] = [];
   //设置所选的项

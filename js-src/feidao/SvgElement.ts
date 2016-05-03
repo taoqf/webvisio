@@ -1,6 +1,5 @@
 
 import {SvgCanvas} from './SvgCanvas';
-import {ISelectable} from './SvgCanvas';
 import {SvgUtility} from './SvgUtility';
 
 let notifyAddedEvent;
@@ -9,7 +8,7 @@ export function registerElementAddedEvent(eventFn) {
   notifyAddedEvent = eventFn;
 };
 
-export class SvgElementBase implements ISelectable {
+export class SvgElementBase {
   protected isDrag: boolean;
   protected id: String;
   protected title: String
@@ -32,8 +31,8 @@ export class SvgElementBase implements ISelectable {
     }
     this.id = id;
     this.businessData = { data1: '', data2: '', data3: '', data4: '', data5: '' };
-    SvgCanvas.CurrentCanvas.AddSvgElementBaseCollection(this);
-    SvgCanvas.CurrentCanvas.groupElement.appendChild(svgElement);
+    svgCanvas.AddSvgElementBaseCollection(this);
+    svgCanvas.groupElement.appendChild(svgElement);
   }
 
   public SetTanslate(x: Number, y: Number): void {
@@ -114,7 +113,7 @@ export class SvgElementBase implements ISelectable {
   }
 }
 
-export class SvgElementShapeItem extends SvgElementBase {
+export class SvgElementShapeItem extends SvgElementBase implements ISelectable {
   private HorizontalOffset: number;
   private VerticalOffset: number;
   private translate: number[];
@@ -204,7 +203,7 @@ export class SvgElementShapeItem extends SvgElementBase {
 
   // 获取与该图形相关的线
   public GetElementLines() {
-    let allElements = SvgCanvas.CurrentCanvas.GetSvgElementsInCanvas();
+    let allElements = this.svgCanvas.GetSvgElementsInCanvas();
     let sourcetlines = [];
     let targetlines = [];
     for (let i = 0; i < allElements.length; i++) {

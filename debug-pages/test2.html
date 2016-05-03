@@ -153,40 +153,40 @@
 				businessType: '',
 				class: 'solidLine'
 			}];
+			var params = {
+				width: 1200,
+				height: 1000,
+				shapeDefine: shapeDefine,
+				lineModels: lines,
+				// runInWpf:true,
+				models: [{
+					id: 'state',
+					model: 'fsm.state',
+					type: 'fsmState',
+					links: ['link1'],
+					defaultText: '状态',
+					showText: true
+				}, {
+					id: 'stateStart',
+					model: 'fsm.state_start',
+					type: 'fsmStateStart',
+					links: ['link1'],
+					defaultText: '初始状态'
+				}, {
+					id: 'hub',
+					model: 'fsm.hub',
+					type: 'fsmHub',
+					links: ['link1'],
+					defaultText: '集线器'
+				}, {
+					id: 'stateEnd',
+					model: 'fsm.state_end',
+					type: 'fsmStateEnd',
+					links: ['link1'],
+					defaultText: '终止状态'
+				}]
+			}
 			domReady(function() {
-				var params = {
-					width: 1200,
-					height: 1000,
-					shapeDefine: shapeDefine,
-					lineModels: lines,
-					// runInWpf:true,
-					models: [{
-						id: 'state',
-						model: 'fsm.state',
-						type: 'fsmState',
-						links: ['link1'],
-						defaultText: '状态',
-						showText: true
-					}, {
-						id: 'stateStart',
-						model: 'fsm.state_start',
-						type: 'fsmStateStart',
-						links: ['link1'],
-						defaultText: '初始状态'
-					}, {
-						id: 'hub',
-						model: 'fsm.hub',
-						type: 'fsmHub',
-						links: ['link1'],
-						defaultText: '集线器'
-					}, {
-						id: 'stateEnd',
-						model: 'fsm.state_end',
-						type: 'fsmStateEnd',
-						links: ['link1'],
-						defaultText: '终止状态'
-					}]
-				}
 				victopDrawing.initCanvas(params);
 				victopDrawing.submitWPF = submitWPF;
 				drawObj = victopDrawing;

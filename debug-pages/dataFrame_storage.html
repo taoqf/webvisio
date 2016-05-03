@@ -123,43 +123,43 @@
 				businessType: '',
 				class: 'solidLine'
 			}];
+			var params = {
+				width: 1200,
+				height: 1000,
+				shapeDefine: shapeDefine,
+				lineModels: lines,
+				runInWpf: true,
+				models: [{
+					id: 'mainFile',
+					model: 'framework.data.stroage.main',
+					type: 'tableMain',
+					links: ['link1', 'link2'],
+					defaultText: '主体',
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'trade',
+					model: 'framework.data.stroage.trade',
+					type: 'tableTrade',
+					links: ['link1', 'link2'],
+					defaultText: '交易',
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'rule',
+					model: 'framework.data.stroage.rule',
+					type: 'tableRule',
+					links: ['link1', 'link2'],
+					defaultText: '业务规则',
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'balance',
+					model: 'framework.data.stroage.balance',
+					type: 'tableBalance',
+					links: ['link1', 'link2'],
+					defaultText: '财务余额',
+					mouseMenu: 'delete,copy'
+				}]
+			}
 			domReady(function() {
-				var params = {
-					width: 1200,
-					height: 1000,
-					shapeDefine: shapeDefine,
-					lineModels: lines,
-					runInWpf: true,
-					models: [{
-						id: 'mainFile',
-						model: 'framework.data.stroage.main',
-						type: 'tableMain',
-						links: ['link1', 'link2'],
-						defaultText: '主体',
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'trade',
-						model: 'framework.data.stroage.trade',
-						type: 'tableTrade',
-						links: ['link1', 'link2'],
-						defaultText: '交易',
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'rule',
-						model: 'framework.data.stroage.rule',
-						type: 'tableRule',
-						links: ['link1', 'link2'],
-						defaultText: '业务规则',
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'balance',
-						model: 'framework.data.stroage.balance',
-						type: 'tableBalance',
-						links: ['link1', 'link2'],
-						defaultText: '财务余额',
-						mouseMenu: 'delete,copy'
-					}]
-				}
 				victopDrawing.initCanvas(params);
 				victopDrawing.submitWPF = submitWPF;
 				drawObj = victopDrawing;

@@ -119,44 +119,44 @@
 				businessType: '',
 				class: 'solidLine'
 			}];
+			var params = {
+				width: 1200,
+				height: 1000,
+				shapeDefine: shapeDefine,
+				lineModels: lines,
+				runInWpf: true,
+				models: [{
+					id: 'businessUint',
+					model: 'framework.business.uint',
+					type: 'businessUint',
+					links: ['link1'],
+					defaultText: '业务主体',
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'businessUintCopy',
+					model: 'framework.business.uint_copy',
+					type: 'businessUintCopy',
+					links: ['link1'],
+					defaultText: '业务主体副本',
+					showText: true,
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'businessCombine',
+					model: 'framework.business.uint_combine',
+					type: 'businessCombine',
+					links: ['link1'],
+					defaultText: '业务主体组合',
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'business',
+					model: 'framework.business.business',
+					type: 'business',
+					links: ['link1'],
+					defaultText: '业务',
+					mouseMenu: 'delete,copy'
+				}]
+			}
 			domReady(function() {
-				var params = {
-					width: 1200,
-					height: 1000,
-					shapeDefine: shapeDefine,
-					lineModels: lines,
-					runInWpf: true,
-					models: [{
-						id: 'businessUint',
-						model: 'framework.business.uint',
-						type: 'businessUint',
-						links: ['link1'],
-						defaultText: '业务主体',
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'businessUintCopy',
-						model: 'framework.business.uint_copy',
-						type: 'businessUintCopy',
-						links: ['link1'],
-						defaultText: '业务主体副本',
-						showText: true,
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'businessCombine',
-						model: 'framework.business.uint_combine',
-						type: 'businessCombine',
-						links: ['link1'],
-						defaultText: '业务主体组合',
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'business',
-						model: 'framework.business.business',
-						type: 'business',
-						links: ['link1'],
-						defaultText: '业务',
-						mouseMenu: 'delete,copy'
-					}]
-				}
 				victopDrawing.initCanvas(params);
 				victopDrawing.submitWPF = submitWPF;
 				drawObj = victopDrawing;

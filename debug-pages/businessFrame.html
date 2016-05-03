@@ -99,36 +99,36 @@
 				businessType: '连接线',
 				class: 'solidLine'
 			}];
+			var params = {
+				width:1200,
+				height:1000,
+				shapeDefine:shapeDefine,
+				lineModels:lines,
+				runInWpf:true,
+				models:[{
+					id:'businessUint',
+					model:'framework.business.uint',
+					type:'业务主体',
+					links:['link1'],
+					defaultText:'业务主体',
+					mouseMenu:'delete,copy'
+				},{
+					id:'businessCombine',
+					model:'framework.business.uint_combine',
+					type:'业务组合',
+					links:['link1'],
+					defaultText:'业务组合',
+					mouseMenu:'delete,copy'
+				},{
+					id:'business',
+					model:'framework.business.business',
+					type:'IMS业务',
+					links:['link1'],
+					defaultText:'IMS业务',
+					mouseMenu:'delete,copy'
+				}]
+			}
 			domReady(function() {
-				var params = {
-					width:1200,
-					height:1000,
-					shapeDefine:shapeDefine,
-					lineModels:lines,
-					runInWpf:true,
-					models:[{
-						id:'businessUint',
-						model:'framework.business.uint',
-						type:'业务主体',
-						links:['link1'],
-						defaultText:'业务主体',
-						mouseMenu:'delete,copy'
-					},{
-						id:'businessCombine',
-						model:'framework.business.uint_combine',
-						type:'业务组合',
-						links:['link1'],
-						defaultText:'业务组合',
-						mouseMenu:'delete,copy'
-					},{
-						id:'business',
-						model:'framework.business.business',
-						type:'IMS业务',
-						links:['link1'],
-						defaultText:'IMS业务',
-						mouseMenu:'delete,copy'
-					}]
-				}
 				victopDrawing.initCanvas(params);
 				victopDrawing.submitWPF = submitWPF;
 				drawObj = victopDrawing;

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -169,63 +168,63 @@
 				defaultText: '外联',
 				businessType: 'outjoin',
 				class: 'solidLine'
-			}, {
+				},{
 				name: 'link2',
 				defaultText: '引用',
 				businessType: 'reference',
 				class: 'dashedLine-green'
 			}];
+			var params = {
+				width: 1200,
+				height: 1000,
+				shapeDefine: shapeDefine,
+				lineModels: lines,
+				runInWpf: true,
+				models: [{
+					id: 'mainFile',
+					model: 'framework.data.table.main',
+					type: 'tableMain',
+					links: ['link1', 'link2'],
+					defaultText: '主档',
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'detail',
+					model: 'framework.data.table.detail',
+					type: 'tableDetail',
+					links: ['link1', 'link2'],
+					defaultText: '档案明细',
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'values',
+					model: 'framework.data.table.values',
+					type: 'tableValues',
+					links: ['link1', 'link2'],
+					defaultText: '值列',
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'trade',
+					model: 'framework.data.table.trade',
+					type: 'tableTrade',
+					links: ['link1', 'link2'],
+					defaultText: '交易',
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'rule',
+					model: 'framework.data.table.rule',
+					type: 'tableRule',
+					links: ['link1', 'link2'],
+					defaultText: '业务规则',
+					mouseMenu: 'delete,copy'
+				}, {
+					id: 'balance',
+					model: 'framework.data.table.balance',
+					type: 'tableBalance',
+					links: ['link1', 'link2'],
+					defaultText: '财务余额',
+					mouseMenu: 'delete,copy'
+				}]
+			}
 			domReady(function() {
-				var params = {
-					width: 1200,
-					height: 1000,
-					shapeDefine: shapeDefine,
-					lineModels: lines,
-					runInWpf: true,
-					models: [{
-						id: 'mainFile',
-						model: 'framework.data.table.main',
-						type: 'tableMain',
-						links: ['link1', 'link2'],
-						defaultText: '主档',
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'detail',
-						model: 'framework.data.table.detail',
-						type: 'tableDetail',
-						links: ['link1', 'link2'],
-						defaultText: '档案明细',
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'values',
-						model: 'framework.data.table.values',
-						type: 'tableValues',
-						links: ['link1', 'link2'],
-						defaultText: '值列',
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'trade',
-						model: 'framework.data.table.trade',
-						type: 'tableTrade',
-						links: ['link1', 'link2'],
-						defaultText: '交易',
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'rule',
-						model: 'framework.data.table.rule',
-						type: 'tableRule',
-						links: ['link1', 'link2'],
-						defaultText: '业务规则',
-						mouseMenu: 'delete,copy'
-					}, {
-						id: 'balance',
-						model: 'framework.data.table.balance',
-						type: 'tableBalance',
-						links: ['link1', 'link2'],
-						defaultText: '财务余额',
-						mouseMenu: 'delete,copy'
-					}]
-				}
 				victopDrawing.initCanvas(params);
 				victopDrawing.submitWPF = submitWPF;
 				drawObj = victopDrawing;
